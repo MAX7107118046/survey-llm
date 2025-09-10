@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jsPsych Survey Text LLM Plugin Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .version-info {
+            background: #e8f4fd;
+            border: 1px solid #3498db;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        
+        .prompt-template {
+            background: #f39c12;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+        
+        .prompt-box {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f8f8f8;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            border-left: 4px solid #3498db;
+        }
+        
+        .example-box {
+            background: #f9f9f9;
+            border: 1px solid #e1e1e1;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 5px 0;
+            padding-left: 15px;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>jsPsych Survey Text LLM Plugin</h1>
+        
+        <div class="version-info">
+            <strong>Current version:</strong> 1.1.0 🆕<br>
+            <strong>Compatible with:</strong> jsPsych v7.x<br>
+            <strong>Type:</strong> Survey plugin with AI integration<br>
+            <strong>🆕 New Features:</strong> 数据收集器、隐藏输入、自动生成、高级按钮控制
+        </div>
+
+        <div class="prompt-template">
+            🤖 AI提示词模板 - 快速使用指南
+        </div>
+        
+        <div class="prompt-box">使用jsPsych Survey Text LLM插件创建实验。
+
+插件功能：
+- 文本输入问卷 + AI交互
+- 支持多问题、随机顺序、必填验证
+- AI回复显示在第二个文本框
+- 记录用户回答、AI回复、响应时间
+- 高级功能：数据收集器、隐藏输入、自动生成、多按钮控制
+
+基本语法：
+{
+  type: jsPsychSurveyTextLLM,
+  questions: [{prompt: "问题文本", rows: 行数, required: true/false, name: "变量名"}],
+  base_url: "https://api.deepseek.com",
+  api_key: "你的API密钥",
+  system_prompt: "AI角色设定",
+  max_tokens: 数字,
+  temperature: 0.0-2.0
+}
+
+高级配置：
+{
+  data_collector: function() { return {responses: 上下文数据}; },  // 收集其他插件数据作为AI上下文
+  hide_user_input: true,                                        // 隐藏用户输入框，只显示AI输出
+  auto_generate: true,                                          // 自动生成AI回复
+  enable_advanced_buttons: true,                                // 启用高级按钮控制
+  button_config: {confirm_locks: true, show_regenerate: true}   // 按钮配置
+}
+
+请根据以下需求生成jsPsych实验代码：[在此描述实验需求]</div>
+
+        <div class="toc">
+            <h3>目录</h3>
+            <ul>
+                <li><a href="#overview">插件概述</a></li>
+                <li><a href="#parameters">参数说明</a></li>
+                <li><a href="#data">数据收集</a></li>
+                <li><a href="#install">安装方法</a></li>
+                <li><a href="#examples">使用示例</a></li>
+                <li><a href="#advanced">高级配置</a></li>
+                <li><a href="#advanced-features">🆕 高级功能详解</a></li>
+                <li><a href="#api-guide">API配置指南</a></li>
+                <li><a href="#troubleshooting">常见问题</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">插件概述</h2>
+        
+        <p>survey-text-llm插件是jsPsych的扩展插件，在标准文本问卷功能基础上集成了大语言模型(LLM)交互能力。参与者可以输入文本回答，并选择性地将回答发送给AI模型获取反馈，AI的回复会显示在专门的回复框中。</p>
+
+        <div class="success">
+            <strong>主要特性：</strong>
+            <ul>
+                <li>✅ 完全兼容标准survey-text插件功能</li>
+                <li>✅ 无缝集成OpenAI兼容的API（DeepSeek、OpenAI、ChatGPT等）</li>
+                <li>✅ 智能UI：仅在配置API时显示AI交互功能</li>
+                <li>✅ 详细数据记录：用户回答、AI回复、交互次数、响应时间</li>
+                <li>✅ 错误处理：网络超时、认证失败、限流等</li>
+                <li>✅ 可配置：模型参数、系统提示词、令牌限制</li>
+                <li>🆕 <strong>数据收集器：</strong>自动收集其他插件/试次数据作为AI上下文</li>
+                <li>🆕 <strong>隐藏输入模式：</strong>支持只显示AI输出，隐藏用户输入框</li>
+                <li>🆕 <strong>自动生成：</strong>试次开始时自动生成AI回复</li>
+                <li>🆕 <strong>高级按钮控制：</strong>确认锁定、重新生成、编辑解锁、自定义按钮</li>
+            </ul>
+        </div>
+
+        <h2 id="parameters">参数说明</h2>
+
+        <p>除了jsPsych插件的通用参数外，本插件支持以下参数：</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>参数名</th>
+                    <th>类型</th>
+                    <th>默认值</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>questions</code></td>
+                    <td>array</td>
+                    <td><code>[]</code></td>
+                    <td>问题数组。每个问题对象包含：<br>
+                    • <code>prompt</code>: 问题文本<br>
+                    • <code>placeholder</code>: 占位符文字<br>
+                    • <code>required</code>: 是否必填<br>
+                    • <code>rows</code>: 文本框行数<br>
+                    • <code>columns</code>: 文本框列数<br>
+                    • <code>name</code>: 变量名</td>
+                </tr>
+                <tr>
+                    <td><code>randomize_question_order</code></td>
+                    <td>boolean</td>
+                    <td><code>false</code></td>
+                    <td>是否随机化问题顺序</td>
+                </tr>
+                <tr>
+                    <td><code>preamble</code></td>
+                    <td>string</td>
+                    <td><code>null</code></td>
+                    <td>显示在问题上方的HTML文本</td>
+                </tr>
+                <tr>
+                    <td><code>button_label</code></td>
+                    <td>string</td>
+                    <td><code>"Continue"</code></td>
+                    <td>提交按钮文字</td>
+                </tr>
+                <tr style="background-color: #fff3cd;">
+                    <td><code>base_url</code></td>
+                    <td>string</td>
+                    <td><code>""</code></td>
+                    <td><strong>AI API基础URL</strong>（必填，用于AI功能）</td>
+                </tr>
+                <tr style="background-color: #fff3cd;">
+                    <td><code>api_key</code></td>
+                    <td>string</td>
+                    <td><code>""</code></td>
+                    <td><strong>API密钥</strong>（必填，用于AI功能）</td>
+                </tr>
+                <tr>
+                    <td><code>api</code></td>
+                    <td>string</td>
+                    <td><code>"/v1/chat/completions"</code></td>
+                    <td>API端点路径</td>
+                </tr>
+                <tr>
+                    <td><code>llm_model</code></td>
+                    <td>string</td>
+                    <td><code>"deepseek-chat"</code></td>
+                    <td>使用的语言模型</td>
+                </tr>
+                <tr>
+                    <td><code>system_prompt</code></td>
+                    <td>string</td>
+                    <td><code>"You are a helpful assistant..."</code></td>
+                    <td>系统提示词，定义AI角色和行为</td>
+                </tr>
+                <tr>
+                    <td><code>max_tokens</code></td>
+                    <td>integer</td>
+                    <td><code>500</code></td>
+                    <td>AI回复的最大令牌数</td>
+                </tr>
+                <tr>
+                    <td><code>temperature</code></td>
+                    <td>float</td>
+                    <td><code>0.7</code></td>
+                    <td>生成温度(0.0-2.0)，越高越随机</td>
+                </tr>
+                <tr>
+                    <td><code>api_timeout</code></td>
+                    <td>integer</td>
+                    <td><code>30000</code></td>
+                    <td>API请求超时时间(毫秒)</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>data_collector</code></td>
+                    <td>function</td>
+                    <td><code>null</code></td>
+                    <td><strong>🆕 数据收集器函数</strong>，返回要传递给AI的上下文数据</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>hide_user_input</code></td>
+                    <td>boolean</td>
+                    <td><code>false</code></td>
+                    <td><strong>🆕 隐藏用户输入</strong>，只显示AI输出框</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>auto_generate</code></td>
+                    <td>boolean</td>
+                    <td><code>false</code></td>
+                    <td><strong>🆕 自动生成</strong>，试次开始时自动生成AI回复</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>enable_advanced_buttons</code></td>
+                    <td>boolean</td>
+                    <td><code>false</code></td>
+                    <td><strong>🆕 启用高级按钮</strong>，显示确认、重新生成、编辑等按钮</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>button_config</code></td>
+                    <td>object</td>
+                    <td><code>{show_confirm: true, ...}</code></td>
+                    <td><strong>🆕 按钮配置</strong>，控制各种按钮的显示和行为</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 id="data">数据收集</h2>
+
+        <p>除了jsPsych插件的标准数据外，本插件还收集以下数据：</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>字段名</th>
+                    <th>类型</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>response</code></td>
+                    <td>object</td>
+                    <td>用户回答。键为问题名称(Q0,Q1...)或自定义name，值为回答文本</td>
+                </tr>
+                <tr>
+                    <td><code>rt</code></td>
+                    <td>numeric</td>
+                    <td>总响应时间(毫秒)</td>
+                </tr>
+                <tr>
+                    <td><code>question_order</code></td>
+                    <td>array</td>
+                    <td>问题显示顺序，如[2,0,1]</td>
+                </tr>
+                <tr style="background-color: #e8f4fd;">
+                    <td><code>ai_response</code></td>
+                    <td>object</td>
+                    <td><strong>AI回复</strong>。键为问题索引，值为AI回复文本。无交互时为null</td>
+                </tr>
+                <tr style="background-color: #e8f4fd;">
+                    <td><code>ai_rt</code></td>
+                    <td>object</td>
+                    <td><strong>AI响应时间</strong>。键为问题索引，值为响应时间(毫秒)</td>
+                </tr>
+                <tr style="background-color: #e8f4fd;">
+                    <td><code>ai_interactions</code></td>
+                    <td>object</td>
+                    <td><strong>AI交互次数</strong>。键为问题索引，值为交互次数</td>
+                </tr>
+                <tr>
+                    <td><code>llm_model</code></td>
+                    <td>string</td>
+                    <td>使用的语言模型名称</td>
+                </tr>
+                <tr>
+                    <td><code>api_config</code></td>
+                    <td>object</td>
+                    <td>API配置信息(base_url, endpoint, has_api状态)</td>
+                </tr>
+                <tr>
+                    <td><code>trial_type</code></td>
+                    <td>string</td>
+                    <td>固定为"survey-text-llm"</td>
+                </tr>
+                <tr>
+                    <td><code>timestamp</code></td>
+                    <td>string</td>
+                    <td>试次完成的ISO时间戳</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>question_states</code></td>
+                    <td>object</td>
+                    <td><strong>🆕 问题状态</strong>。键为问题索引，值为状态(ready/generating/confirmed/editing等)</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>button_interactions</code></td>
+                    <td>object</td>
+                    <td><strong>🆕 按钮交互记录</strong>。记录所有按钮点击事件的时间戳和动作</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>collected_context</code></td>
+                    <td>object</td>
+                    <td><strong>🆕 收集的上下文</strong>。data_collector函数返回的数据</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>advanced_mode</code></td>
+                    <td>boolean</td>
+                    <td><strong>🆕 高级模式标记</strong>。是否启用了高级按钮功能</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>hide_user_input</code></td>
+                    <td>boolean</td>
+                    <td><strong>🆕 隐藏输入标记</strong>。是否隐藏了用户输入框</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><code>auto_generated</code></td>
+                    <td>boolean</td>
+                    <td><strong>🆕 自动生成标记</strong>。是否使用了自动生成功能</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 id="install">安装方法</h2>
+
+        <div class="example-box">
+            <h3>方法1：本地文件引用</h3>
+            <pre><code>&lt;script src="survey-text-llm.js"&gt;&lt;/script&gt;
+&lt;link href="survey-text-llm.css" rel="stylesheet" type="text/css" /&gt;</code></pre>
+
+            <h3>方法2：项目集成</h3>
+            <p>将<code>survey-text-llm.js</code>和<code>survey-text-llm.css</code>文件放入项目目录，在HTML中引用。</p>
+        </div>
+
+        <h2 id="examples">使用示例</h2>
+
+        <h3>基础示例：单个问题</h3>
+        <div class="example-box">
+            <pre><code>var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: [
+    {prompt: '请描述您的学习经历'}
+  ]
+};</code></pre>
+        </div>
+
+        <h3>带AI交互的问卷</h3>
+        <div class="example-box">
+            <pre><code>var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: [
+    {
+      prompt: '您在学习中遇到了什么挑战？',
+      rows: 4,
+      required: true,
+      name: 'learning_challenges'
+    }
+  ],
+  base_url: "https://api.deepseek.com",
+  api_key: "sk-your-api-key-here",
+  system_prompt: "你是一位教育专家，请提供建设性的学习建议。",
+  max_tokens: 300
+};</code></pre>
+        </div>
+
+        <h3>多问题问卷</h3>
+        <div class="example-box">
+            <pre><code>var trial = {
+  type: jsPsychSurveyTextLLM,
+  preamble: '&lt;h3&gt;学习经历调查&lt;/h3&gt;&lt;p&gt;请真实回答以下问题：&lt;/p&gt;',
+  questions: [
+    {
+      prompt: '您最喜欢的学习方法是什么？',
+      placeholder: '例如：视频学习、阅读、实践等',
+      required: true,
+      name: 'learning_method'
+    },
+    {
+      prompt: '描述一次成功的学习经历',
+      rows: 5,
+      required: true,
+      name: 'success_story'
+    },
+    {
+      prompt: '您希望在哪些方面提升自己？',
+      rows: 3,
+      name: 'improvement_areas'
+    }
+  ],
+  randomize_question_order: false,
+  button_label: '提交问卷',
+  base_url: "https://api.deepseek.com",
+  api_key: "sk-your-api-key-here",
+  llm_model: "deepseek-chat",
+  system_prompt: "你是一位温暖友善的学习顾问，请根据用户的回答提供个性化的学习建议和鼓励。",
+  temperature: 0.8,
+  max_tokens: 400
+};</code></pre>
+        </div>
+
+        <h2 id="advanced">高级配置</h2>
+
+        <h3>🆕 数据收集器功能</h3>
+        <div class="example-box">
+            <pre><code>// 收集之前试次的数据作为AI上下文
+var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: [
+    {prompt: '基于您之前的回答，请进一步阐述您的想法', rows: 4}
+  ],
+  data_collector: function() {
+    // 收集之前的实验数据
+    const previousTrials = jsPsych.data.get().values();
+    return {
+      responses: previousTrials.map(t => t.response).filter(r => r),
+      trials: previousTrials.length,
+      last_response: previousTrials.length > 0 ? previousTrials[previousTrials.length - 1].response : null,
+      custom: {
+        total_time: previousTrials.reduce((sum, trial) => sum + (trial.rt || 0), 0)
+      }
+    };
+  },
+  base_url: "https://api.deepseek.com",
+  api_key: "sk-your-api-key-here",
+  system_prompt: "根据用户之前的实验数据，提供个性化的深度分析。"
+};</code></pre>
+        </div>
+
+        <h3>🆕 隐藏输入 + 自动生成</h3>
+        <div class="example-box">
+            <pre><code>// 只显示AI生成的内容，不显示输入框
+var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: [
+    {prompt: 'AI专家基于您的信息自动生成的个性化建议：', name: 'auto_advice'}
+  ],
+  hide_user_input: true,    // 隐藏用户输入框
+  auto_generate: true,      // 自动生成AI回复
+  data_collector: function() {
+    // 收集上下文数据
+    return {responses: jsPsych.data.get().values()};
+  },
+  base_url: "https://api.deepseek.com",
+  api_key: "sk-your-api-key-here",
+  system_prompt: "基于用户的背景信息，生成个性化建议。",
+  max_tokens: 400
+};</code></pre>
+        </div>
+
+        <h3>🆕 高级按钮控制</h3>
+        <div class="example-box">
+            <pre><code>// 启用高级按钮交互功能
+var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: [
+    {prompt: '请提出您希望深入探讨的问题', rows: 3, required: true}
+  ],
+  enable_advanced_buttons: true,
+  button_config: {
+    show_confirm: true,         // 显示确认按钮
+    show_regenerate: true,      // 显示重新生成按钮
+    show_edit: true,           // 显示编辑按钮
+    confirm_locks: true,       // 确认后锁定文本框
+    custom_buttons: [          // 自定义按钮
+      {
+        label: '🌟 增强',
+        action: 'enhance',
+        callback: function(question_index, response_data, ai_response) {
+          const current = ai_response.value;
+          ai_response.value = `✨ 增强版回复：\n\n${current}\n\n📚 补充说明...`;
+        }
+      },
+      {
+        label: '📋 摘要',
+        action: 'summarize',
+        callback: function(question_index, response_data, ai_response) {
+          const lines = ai_response.value.split('\n').filter(line => line.trim());
+          ai_response.value = `📋 摘要：${lines.slice(0, 2).join(' ')}`;
+        }
+      }
+    ]
+  },
+  base_url: "https://api.deepseek.com",
+  api_key: "sk-your-api-key-here",
+  system_prompt: "提供深入、详细的分析和见解。",
+  temperature: 0.8
+};</code></pre>
+        </div>
+
+        <h3>动态问题生成</h3>
+        <div class="example-box">
+            <pre><code>var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: function() {
+    // 根据之前的实验数据动态生成问题
+    const previous_data = jsPsych.data.get().last(1).values()[0];
+    return [
+      {
+        prompt: `基于您之前的回答"${previous_data.response}"，请进一步阐述...`,
+        rows: 4,
+        required: true
+      }
+    ];
+  },
+  base_url: "https://api.deepseek.com",
+  api_key: "sk-your-api-key-here"
+};</code></pre>
+        </div>
+
+        <h3>自定义API配置</h3>
+        <div class="example-box">
+            <pre><code>var trial = {
+  type: jsPsychSurveyTextLLM,
+  questions: [
+    {prompt: '请分享您的想法', rows: 3}
+  ],
+  base_url: "https://api.openai.com",
+  api: "/v1/chat/completions",
+  api_key: "sk-your-openai-key",
+  llm_model: "gpt-3.5-turbo",
+  api_headers: {
+    "Content-Type": "application/json",
+    "User-Agent": "MyExperiment/1.0"
+  },
+  api_timeout: 45000
+};</code></pre>
+        </div>
+
+        <h2 id="advanced-features">🆕 高级功能详解</h2>
+
+        <div class="success">
+            <h3>功能概览</h3>
+            <p>新版本插件提供了四大高级功能，大幅扩展了实验设计的灵活性：</p>
+            <ul>
+                <li><strong>📊 数据收集器：</strong>自动收集其他插件/试次的数据作为AI上下文</li>
+                <li><strong>👁️ 隐藏输入模式：</strong>支持只显示AI输出，不显示用户输入框</li>
+                <li><strong>⚡ 自动生成：</strong>试次开始时自动生成AI回复</li>
+                <li><strong>🎮 高级按钮控制：</strong>确认锁定、重新生成、编辑解锁、自定义按钮</li>
+            </ul>
+        </div>
+
+        <h3>📊 数据收集器功能</h3>
+        <div class="example-box">
+            <h4>功能说明</h4>
+            <p><code>data_collector</code>参数允许您定义一个函数，自动收集之前试次或其他插件的数据，并将这些数据作为上下文传递给AI。</p>
+            
+            <h4>典型应用场景</h4>
+            <ul>
+                <li>基于用户之前回答的个性化AI建议</li>
+                <li>多轮对话中的上下文保持</li>
+                <li>实验中期的个性化干预</li>
+                <li>基于表现的自适应反馈</li>
+            </ul>
+
+            <h4>数据收集器返回格式</h4>
+            <pre><code>// 推荐的返回数据结构
+{
+  responses: [...],        // 之前的回答
+  trials: 数字,           // 试次数量
+  last_response: "...",   // 最后一次回答
+  custom: {               // 自定义数据
+    total_time: 毫秒,
+    user_id: "...",
+    // 其他相关数据
+  }
+}</code></pre>
+        </div>
+
+        <h3>👁️ 隐藏输入模式</h3>
+        <div class="example-box">
+            <h4>功能说明</h4>
+            <p>使用<code>hide_user_input: true</code>可以隐藏用户输入框，只显示AI生成的内容。通常与<code>auto_generate</code>和<code>data_collector</code>配合使用。</p>
+            
+            <h4>典型应用场景</h4>
+            <ul>
+                <li>展示AI生成的个性化报告</li>
+                <li>基于用户数据的自动分析结果</li>
+                <li>实验结果的智能总结</li>
+                <li>个性化建议的呈现</li>
+            </ul>
+        </div>
+
+        <h3>⚡ 自动生成功能</h3>
+        <div class="example-box">
+            <h4>功能说明</h4>
+            <p>设置<code>auto_generate: true</code>后，试次开始时会自动调用AI生成回复，无需用户输入。</p>
+            
+            <h4>最佳搭配</h4>
+            <pre><code>// 完美组合：隐藏输入 + 自动生成 + 数据收集
+{
+  hide_user_input: true,
+  auto_generate: true,
+  data_collector: function() {
+    return {/* 收集的上下文数据 */};
+  }
+}</code></pre>
+        </div>
+
+        <h3>🎮 高级按钮控制</h3>
+        <div class="example-box">
+            <h4>功能说明</h4>
+            <p>启用<code>enable_advanced_buttons: true</code>后，可以使用多种交互按钮来控制AI回复的状态。</p>
+            
+            <h4>按钮类型</h4>
+            <table style="font-size: 12px;">
+                <tr>
+                    <th>按钮</th>
+                    <th>功能</th>
+                    <th>配置参数</th>
+                </tr>
+                <tr>
+                    <td>确认</td>
+                    <td>锁定AI回复，防止修改</td>
+                    <td><code>show_confirm: true</code></td>
+                </tr>
+                <tr>
+                    <td>重新生成</td>
+                    <td>生成新的AI回复</td>
+                    <td><code>show_regenerate: true</code></td>
+                </tr>
+                <tr>
+                    <td>编辑</td>
+                    <td>解锁回复框，允许手动编辑</td>
+                    <td><code>show_edit: true</code></td>
+                </tr>
+                <tr>
+                    <td>自定义</td>
+                    <td>执行用户定义的操作</td>
+                    <td><code>custom_buttons: [...]</code></td>
+                </tr>
+            </table>
+
+            <h4>自定义按钮配置</h4>
+            <pre><code>custom_buttons: [
+  {
+    label: "按钮文字",
+    action: "action_name",
+    callback: function(question_index, response_data, ai_response) {
+      // 自定义操作逻辑
+      ai_response.value = "修改后的内容";
+    }
+  }
+]</code></pre>
+        </div>
+
+        <h3>🔄 状态管理</h3>
+        <div class="note">
+            <h4>问题状态</h4>
+            <p>高级模式下，每个问题都有状态标识：</p>
+            <ul>
+                <li><code>ready</code> - 准备就绪</li>
+                <li><code>generating</code> - AI生成中</li>
+                <li><code>generated</code> - AI已生成</li>
+                <li><code>confirmed</code> - 已确认锁定</li>
+                <li><code>editing</code> - 编辑模式</li>
+                <li><code>error</code> - 生成错误</li>
+            </ul>
+        </div>
+
+        <h2 id="api-guide">API配置指南</h2>
+
+        <h3>支持的AI服务</h3>
+        
+        <div class="example-box">
+            <h4>DeepSeek API</h4>
+            <pre><code>base_url: "https://api.deepseek.com"
+api_key: "sk-your-deepseek-key"
+llm_model: "deepseek-chat"</code></pre>
+
+            <h4>OpenAI API</h4>
+            <pre><code>base_url: "https://api.openai.com"
+api_key: "sk-your-openai-key"
+llm_model: "gpt-3.5-turbo" // 或 "gpt-4"</code></pre>
+
+            <h4>其他兼容服务</h4>
+            <p>任何支持OpenAI Chat Completions API格式的服务都可以使用，只需修改<code>base_url</code>和相应的<code>api_key</code>。</p>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ 安全提醒：</strong>
+            <ul>
+                <li>不要在客户端代码中硬编码API密钥</li>
+                <li>考虑使用环境变量或服务器端代理</li>
+                <li>注意API调用的费用和频率限制</li>
+                <li>用户数据将发送到AI服务，请确保符合隐私政策</li>
+            </ul>
+        </div>
+
+        <h2 id="troubleshooting">常见问题</h2>
+
+        <h3>Q: AI按钮不显示？</h3>
+        <div class="note">
+            <strong>A:</strong> 确保同时提供了<code>base_url</code>和<code>api_key</code>参数。只有在API配置完整时，AI交互功能才会显示。
+        </div>
+
+        <h3>Q: API调用失败？</h3>
+        <div class="note">
+            <strong>A:</strong> 检查以下几点：
+            <ul>
+                <li>API密钥是否正确且有效</li>
+                <li>网络连接是否正常</li>
+                <li>API服务是否支持CORS跨域请求</li>
+                <li>是否超出了API调用限制</li>
+            </ul>
+        </div>
+
+        <h3>Q: 如何自定义错误消息？</h3>
+        <div class="note">
+            <strong>A:</strong> 插件已内置了用户友好的错误处理。如需自定义，可以修改<code>getErrorMessage</code>方法。
+        </div>
+
+        <h3>Q: 数据如何导出？</h3>
+        <div class="note">
+            <strong>A:</strong> 使用jsPsych标准方法：
+            <pre><code>// 获取数据
+const data = jsPsych.data.get();
+
+// 导出为CSV
+data.csv();
+
+// 导出为JSON
+data.json();</code></pre>
+        </div>
+
+        <h3>Q: 如何在没有API的情况下测试？</h3>
+        <div class="note">
+            <strong>A:</strong> 不提供<code>base_url</code>和<code>api_key</code>参数，插件将作为标准文本问卷运行，不显示AI功能。
+        </div>
+
+        <h3>Q: 高级功能如何组合使用？</h3>
+        <div class="note">
+            <strong>A:</strong> 高级功能可以灵活组合：
+            <ul>
+                <li><strong>数据驱动的自动生成：</strong><code>data_collector + auto_generate + hide_user_input</code></li>
+                <li><strong>交互式内容编辑：</strong><code>enable_advanced_buttons + button_config</code></li>
+                <li><strong>多轮上下文对话：</strong><code>data_collector + enable_advanced_buttons</code></li>
+            </ul>
+        </div>
+
+        <h3>Q: 如何处理数据收集器错误？</h3>
+        <div class="note">
+            <strong>A:</strong> 插件内置了错误处理。如果<code>data_collector</code>函数出错，会在控制台显示警告，但不会中断实验进行。
+        </div>
+
+        <div class="success">
+            <h3>🎯 最佳实践</h3>
+            <ul>
+                <li><strong>渐进增强：</strong>先测试基础问卷功能，再添加AI交互</li>
+                <li><strong>用户体验：</strong>提供清晰的指导语，解释AI交互是可选的</li>
+                <li><strong>数据质量：</strong>使用<code>required</code>参数确保关键问题有回答</li>
+                <li><strong>性能优化：</strong>合理设置<code>max_tokens</code>和<code>api_timeout</code></li>
+                <li><strong>错误处理：</strong>告知参与者网络问题时的处理方式</li>
+                <li><strong>🆕 高级功能测试：</strong>在使用高级功能前先用简单配置测试</li>
+                <li><strong>🆕 数据收集器优化：</strong>确保data_collector函数轻量且快速</li>
+                <li><strong>🆕 按钮状态管理：</strong>合理配置按钮显示和锁定逻辑</li>
+                <li><strong>🆕 上下文数据安全：</strong>注意不要在上下文中包含敏感信息</li>
+            </ul>
+        </div>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #3498db;">
+        
+        <div style="text-align: center; color: #7f8c8d; font-size: 14px;">
+            <p><strong>jsPsych Survey Text LLM Plugin v1.1.0</strong></p>
+            <p>基于jsPsych v7构建 | 支持OpenAI兼容API | 开源免费使用 | 🆕 新增高级功能</p>
+        </div>
+    </div>
+</body>
+</html>

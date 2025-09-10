@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Text LLM - 高级功能示例</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="survey-text-llm.js"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <link href="survey-text-llm.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .demo-header {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .demo-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .demo-header p {
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🚀 Survey Text LLM 高级功能演示</h1>
+        <p>展示数据收集、隐藏输入、高级按钮控制等功能</p>
+    </div>
+
+    <div id="jspsych-target"></div>
+
+    <script>
+        // 初始化jsPsych
+        const jsPsych = initJsPsych({
+            on_finish: function(data) {
+                // 显示实验结果
+                const trials = data.trials;
+                
+                document.getElementById('jspsych-target').innerHTML = `
+                    <div style="max-width: 1000px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                        <h2 style="color: #2c3e50; text-align: center; margin-bottom: 30px;">🎉 实验完成！</h2>
+                        
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h3>📊 收集到的数据</h3>
+                            <pre style="background: white; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px;">${JSON.stringify(trials, null, 2)}</pre>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button onclick="location.reload()" style="background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 16px;">
+                                🔄 重新开始演示
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        // 数据收集器函数 - 从之前的试次收集数据
+        function collectPreviousData() {
+            const previousTrials = jsPsych.data.get().values();
+            
+            return {
+                responses: previousTrials.map(trial => trial.response).filter(r => r),
+                trials: previousTrials.length,
+                last_response: previousTrials.length > 0 ? previousTrials[previousTrials.length - 1].response : null,
+                custom: {
+                    experiment_start_time: previousTrials.length > 0 ? previousTrials[0].time_elapsed : Date.now(),
+                    total_time: previousTrials.reduce((sum, trial) => sum + (trial.rt || 0), 0)
+                }
+            };
+        }
+
+        // 实验流程
+        const timeline = [];
+
+        // 1. 欢迎页面
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+                <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+                    <h1>🔬 高级功能演示</h1>
+                    <p style="font-size: 18px; line-height: 1.6;">
+                        本演示将展示Survey Text LLM插件的四个高级功能：
+                    </p>
+                    <div style="text-align: left; display: inline-block; margin: 30px 0;">
+                        <ol style="font-size: 16px; line-height: 2;">
+                            <li><strong>数据收集功能：</strong>自动收集之前试次的数据作为AI上下文</li>
+                            <li><strong>隐藏用户输入：</strong>只显示AI输出，不显示输入框</li>
+                            <li><strong>自动生成：</strong>试次开始时自动生成AI回复</li>
+                            <li><strong>高级按钮控制：</strong>确认、重新生成、编辑等按钮</li>
+                        </ol>
+                    </div>
+                    <p style="color: #7f8c8d;">按任意键开始演示</p>
+                </div>
+            `
+        });
+
+        // 2. 基础数据收集（为后续演示提供上下文）
+        timeline.push({
+            type: jsPsychSurveyText,
+            preamble: `
+                <h2>📝 第一步：基础信息收集</h2>
+                <p>请填写以下信息，这些数据将在后续的AI交互中作为上下文使用：</p>
+            `,
+            questions: [
+                {prompt: "您的研究领域或专业：", name: "field", required: true},
+                {prompt: "您目前最感兴趣的话题：", name: "interest", required: true, rows: 2},
+                {prompt: "您希望从AI那里得到什么类型的建议？", name: "expectation", required: true, rows: 3}
+            ],
+            button_label: "继续到高级功能演示"
+        });
+
+        // 3. 功能1：数据收集器 + 基础AI交互
+        timeline.push({
+            type: jsPsychSurveyTextLLM,
+            preamble: `
+                <h2>🔍 功能1：数据收集器</h2>
+                <div class="instruction-box">
+                    <p><strong>演示功能：</strong>使用<code>data_collector</code>函数自动收集之前试次的数据作为AI上下文</p>
+                    <p>AI将根据您之前填写的信息来提供个性化回复。</p>
+                </div>
+            `,
+            questions: [
+                {
+                    prompt: "根据您之前提供的信息，请描述一个您在该领域遇到的具体挑战：",
+                    rows: 4,
+                    required: true,
+                    name: "challenge"
+                }
+            ],
+            data_collector: collectPreviousData,
+            base_url: "https://api.deepseek.com",
+            api_key: "sk-7765bd6343924036b8bf4152cd5c3649",
+            system_prompt: "根据用户之前提供的背景信息，作为该领域的专家顾问，提供针对性的建议和解决方案。",
+            button_label: "继续下一个功能演示"
+        });
+
+        // 4. 功能2：隐藏用户输入 + 自动生成
+        timeline.push({
+            type: jsPsychSurveyTextLLM,
+            preamble: `
+                <h2>🎭 功能2：隐藏输入 + 自动生成</h2>
+                <div class="instruction-box">
+                    <p><strong>演示功能：</strong></p>
+                    <ul>
+                        <li><code>hide_user_input: true</code> - 隐藏用户输入框</li>
+                        <li><code>auto_generate: true</code> - 自动生成AI回复</li>
+                        <li><code>data_collector</code> - 基于之前的数据生成回复</li>
+                    </ul>
+                    <p>页面加载后，AI会自动基于您之前的回答生成个性化建议。</p>
+                </div>
+            `,
+            questions: [
+                {
+                    prompt: "🤖 AI专家基于您的信息自动生成的个性化建议：",
+                    name: "auto_advice"
+                }
+            ],
+            hide_user_input: true,
+            auto_generate: true,
+            data_collector: collectPreviousData,
+            base_url: "https://api.deepseek.com",
+            api_key: "sk-7765bd6343924036b8bf4152cd5c3649",
+            system_prompt: "基于用户的背景信息和挑战，生成3-5条具体可行的解决建议，每条建议包含具体的行动步骤。",
+            max_tokens: 400,
+            button_label: "继续高级按钮演示"
+        });
+
+        // 5. 功能3：高级按钮控制
+        timeline.push({
+            type: jsPsychSurveyTextLLM,
+            preamble: `
+                <h2>🎮 功能3：高级按钮控制</h2>
+                <div class="instruction-box">
+                    <p><strong>演示功能：</strong>多按钮交互控制</p>
+                    <ul>
+                        <li><strong>确认：</strong>锁定AI回复，不可修改</li>
+                        <li><strong>重新生成：</strong>生成新的AI回复</li>
+                        <li><strong>编辑：</strong>解锁回复框，允许手动编辑</li>
+                        <li><strong>自定义按钮：</strong>执行特殊操作</li>
+                    </ul>
+                    <p>请输入问题后点击"Send to AI"，然后体验各种按钮功能。</p>
+                </div>
+            `,
+            questions: [
+                {
+                    prompt: "请提出一个您希望深入探讨的问题：",
+                    rows: 3,
+                    required: true,
+                    name: "deep_question"
+                }
+            ],
+            enable_advanced_buttons: true,
+            button_config: {
+                show_confirm: true,
+                show_regenerate: true,
+                show_edit: true,
+                confirm_locks: true,
+                custom_buttons: [
+                    {
+                        label: "🌟 加强",
+                        action: "enhance",
+                        callback: function(question_index, response_data, ai_response) {
+                            if (ai_response) {
+                                const current = ai_response.value;
+                                ai_response.value = `✨ 增强版回复：\n\n${current}\n\n📚 补充说明：这是一个通过自定义按钮增强的回复，展示了插件的扩展能力。`;
+                            }
+                        }
+                    },
+                    {
+                        label: "📋 摘要",
+                        action: "summarize",
+                        callback: function(question_index, response_data, ai_response) {
+                            if (ai_response) {
+                                const current = ai_response.value;
+                                const lines = current.split('\n').filter(line => line.trim());
+                                const summary = lines.slice(0, 2).join(' ');
+                                ai_response.value = `📋 摘要版本：${summary}`;
+                            }
+                        }
+                    }
+                ]
+            },
+            data_collector: collectPreviousData,
+            base_url: "https://api.deepseek.com",
+            api_key: "sk-7765bd6343924036b8bf4152cd5c3649",
+            system_prompt: "作为该领域的资深专家，提供深入、详细的分析和见解。回复应该既有理论深度又有实践价值。",
+            temperature: 0.8,
+            max_tokens: 500,
+            button_label: "完成高级功能演示"
+        });
+
+        // 6. 结束页面
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+                <div style="text-align: center;">
+                    <h2>🎉 高级功能演示完成！</h2>
+                    <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin: 30px 0;">
+                        <h3>📋 演示功能总结</h3>
+                        <div style="text-align: left; display: inline-block;">
+                            <p>✅ <strong>数据收集器：</strong>自动收集并传递上下文数据给AI</p>
+                            <p>✅ <strong>隐藏输入模式：</strong>纯AI输出展示，适合结果呈现</p>
+                            <p>✅ <strong>自动生成：</strong>页面加载时自动触发AI生成</p>
+                            <p>✅ <strong>高级按钮：</strong>确认锁定、重新生成、编辑解锁、自定义操作</p>
+                        </div>
+                    </div>
+                    <p style="color: #7f8c8d;">按任意键查看完整的实验数据</p>
+                </div>
+            `
+        });
+
+        // 运行实验
+        jsPsych.run(timeline);
+    </script>
+</body>
+</html>
