@@ -1,0 +1,654 @@
+/**
+ * CSS Styles for AI Survey Plugin v1.0
+ * 
+ * 合并版本样式：包含高级按钮控制和批量分析的完整样式
+ * Features:
+ * - 高级按钮控制样式
+ * - 批量分析和统一分析样式
+ * - 分离式输入输出样式
+ * - 响应式设计和无障碍支持
+ */
+
+/* ===== 主容器和基础布局 ===== */
+#jspsych-ai-survey,
+#jspsych-ai-survey-input,
+#jspsych-ai-survey-output {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Open Sans', 'Arial', sans-serif;
+  line-height: 1.6;
+}
+
+/* 前言样式 */
+.jspsych-ai-survey-preamble {
+  background-color: #f8f9fa;
+  border-left: 4px solid #007bff;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* 表单样式 */
+#jspsych-ai-survey-form,
+#jspsych-ai-survey-input-form {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+/* 问题容器 */
+.jspsych-ai-survey-question {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background-color: #fafbfc;
+}
+
+/* 问题文本 */
+.jspsych-ai-survey-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+/* ===== 输入区域布局 ===== */
+/* 输入容器 - 弹性布局支持并排显示 */
+.jspsych-ai-survey-input-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* 输入部分 */
+.jspsych-ai-survey-input-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* AI交互部分 */
+.jspsych-ai-survey-ai-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+/* 标签样式 */
+.jspsych-ai-survey-label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== 输入框和文本区域 ===== */
+.jspsych-ai-survey-textbox {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #ced4da;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: inherit;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: white;
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+.jspsych-ai-survey-textbox:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.jspsych-ai-survey-textbox:required {
+  border-left: 4px solid #dc3545;
+}
+
+.jspsych-ai-survey-textbox:required:valid {
+  border-left: 4px solid #28a745;
+}
+
+/* ===== AI按钮样式 ===== */
+.jspsych-ai-survey-ai-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-ai-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.jspsych-ai-survey-ai-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ===== 加载指示器 ===== */
+.jspsych-ai-survey-loading {
+  display: inline-flex;
+  align-items: center;
+  color: #007bff;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.jspsych-ai-survey-loading::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== AI响应文本区域 ===== */
+.jspsych-ai-survey-ai-response {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #28a745;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  background-color: #f8fff9;
+  color: #155724;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.jspsych-ai-survey-ai-response:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* 只读和可锁定响应框 */
+.jspsych-ai-survey-ai-response.readonly {
+  background-color: #f8fff9;
+  cursor: default;
+}
+
+.jspsych-ai-survey-ai-response.lockable {
+  transition: all 0.3s ease;
+}
+
+.jspsych-ai-survey-ai-response.locked {
+  background-color: #f8f9fa !important;
+  border-color: #6c757d !important;
+  color: #495057;
+  cursor: not-allowed;
+}
+
+.jspsych-ai-survey-ai-response.locked::placeholder {
+  color: #6c757d;
+}
+
+/* ===== 高级按钮控制组 ===== */
+.jspsych-ai-survey-button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+/* 确认按钮 */
+.jspsych-ai-survey-confirm-button {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-confirm-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.jspsych-ai-survey-confirm-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 重新生成按钮 */
+.jspsych-ai-survey-regenerate-button {
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  color: #212529;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-regenerate-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+}
+
+.jspsych-ai-survey-regenerate-button:disabled {
+  background: #6c757d;
+  color: white;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 编辑按钮 */
+.jspsych-ai-survey-edit-button {
+  background: linear-gradient(135deg, #17a2b8, #6f42c1);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-edit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(23, 162, 184, 0.4);
+}
+
+.jspsych-ai-survey-edit-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 自定义按钮 */
+.jspsych-ai-survey-custom-button {
+  background: linear-gradient(135deg, #e83e8c, #fd7e14);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-custom-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(232, 62, 140, 0.4);
+}
+
+.jspsych-ai-survey-custom-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ===== 状态指示器 ===== */
+.jspsych-ai-survey-status {
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-status .status-text {
+  color: #007bff;
+}
+
+/* ===== 统一分析区域 ===== */
+.jspsych-ai-survey-unified-analysis {
+  margin: 30px 0;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background-color: #fafbfc;
+}
+
+.jspsych-ai-survey-analysis-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 15px 0;
+}
+
+.jspsych-ai-survey-unified-analysis-result {
+  width: 100%;
+  min-height: 200px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 12px;
+  border: 2px solid #ced4da;
+  border-radius: 6px;
+  background-color: white;
+  resize: vertical;
+}
+
+.jspsych-ai-survey-unified-analysis-result:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* ===== 分析按钮 ===== */
+.jspsych-ai-survey-analysis-button {
+  background: linear-gradient(135deg, #007bff, #6610f2);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jspsych-ai-survey-analysis-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+.jspsych-ai-survey-analysis-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 批量分析区域 */
+.jspsych-ai-survey-batch-analysis {
+  margin: 30px 0;
+  text-align: center;
+}
+
+/* ===== 分离输入输出模式样式 ===== */
+.jspsych-ai-survey-output-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background-color: #fafbfc;
+}
+
+.jspsych-ai-survey-ai-analysis-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.jspsych-ai-survey-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 15px 0;
+}
+
+/* 回顾项目样式 */
+.jspsych-ai-survey-review-item {
+  margin-bottom: 15px;
+  padding: 15px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.jspsych-ai-survey-review-item:last-child {
+  border-bottom: none;
+}
+
+.jspsych-ai-survey-review-question {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.jspsych-ai-survey-review-answer {
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  min-height: 40px;
+  line-height: 1.4;
+}
+
+/* 批量输出和个别输出区域 */
+.jspsych-ai-survey-batch-output {
+  margin-bottom: 20px;
+}
+
+.jspsych-ai-survey-individual-output {
+  margin-bottom: 25px;
+  padding: 20px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.jspsych-ai-survey-individual-output:last-child {
+  border-bottom: none;
+}
+
+.jspsych-ai-survey-individual-output h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 15px 0;
+}
+
+/* ===== 主要提交按钮 ===== */
+.jspsych-ai-survey,
+#jspsych-ai-survey-output-finish {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 30px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 150px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.jspsych-ai-survey:hover,
+#jspsych-ai-survey-output-finish:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.jspsych-ai-survey:active,
+#jspsych-ai-survey-output-finish:active {
+  transform: translateY(0);
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  #jspsych-ai-survey,
+  #jspsych-ai-survey-input,
+  #jspsych-ai-survey-output {
+    padding: 10px;
+  }
+  
+  #jspsych-ai-survey-form,
+  #jspsych-ai-survey-input-form {
+    padding: 20px;
+  }
+  
+  .jspsych-ai-survey-input-container {
+    flex-direction: column;
+  }
+  
+  .jspsych-ai-survey-input-section,
+  .jspsych-ai-survey-ai-section {
+    min-width: auto;
+  }
+  
+  .jspsych-ai-survey-question {
+    padding: 15px;
+  }
+  
+  .jspsych-ai-survey-button-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .jspsych-ai-survey-button-group button {
+    width: 100%;
+  }
+}
+
+/* ===== 无障碍支持 ===== */
+.jspsych-ai-survey-textbox:focus,
+.jspsych-ai-survey-ai-response:focus,
+.jspsych-ai-survey-ai-button:focus,
+.jspsych-ai-survey:focus,
+.jspsych-ai-survey-confirm-button:focus,
+.jspsych-ai-survey-regenerate-button:focus,
+.jspsych-ai-survey-edit-button:focus,
+.jspsych-ai-survey-custom-button:focus,
+.jspsych-ai-survey-analysis-button:focus,
+#jspsych-ai-survey-output-finish:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .jspsych-ai-survey-textbox,
+  .jspsych-ai-survey-ai-response {
+    border-width: 3px;
+  }
+  
+  .jspsych-ai-survey-question {
+    border-width: 2px;
+  }
+  
+  .jspsych-ai-survey-button-group button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  .jspsych-ai-survey-ai-button,
+  .jspsych-ai-survey,
+  .jspsych-ai-survey-confirm-button,
+  .jspsych-ai-survey-regenerate-button,
+  .jspsych-ai-survey-edit-button,
+  .jspsych-ai-survey-custom-button,
+  .jspsych-ai-survey-analysis-button,
+  #jspsych-ai-survey-output-finish,
+  .jspsych-ai-survey-ai-response.lockable {
+    transition: none;
+  }
+  
+  .jspsych-ai-survey-ai-button:hover,
+  .jspsych-ai-survey:hover,
+  .jspsych-ai-survey-confirm-button:hover,
+  .jspsych-ai-survey-regenerate-button:hover,
+  .jspsych-ai-survey-edit-button:hover,
+  .jspsych-ai-survey-custom-button:hover,
+  .jspsych-ai-survey-analysis-button:hover,
+  #jspsych-ai-survey-output-finish:hover {
+    transform: none;
+  }
+  
+  .jspsych-ai-survey-loading::before {
+    animation: none;
+  }
+}
+
+/* ===== 特殊状态样式 ===== */
+/* 隐藏输入模式 */
+.jspsych-ai-survey-input-section.hidden {
+  display: none;
+}
+
+/* 自动生成模式样式 */
+.auto-generated .jspsych-ai-survey-ai-response {
+  border-color: #17a2b8;
+  background-color: #f0f9ff;
+}
+
+.auto-generated .jspsych-ai-survey-status .status-text {
+  color: #17a2b8;
+}
+
+/* 错误状态样式 */
+.error-state .jspsych-ai-survey-ai-response {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* 成功状态样式 */
+.success-state .jspsych-ai-survey-ai-response {
+  border-color: #28a745;
+  background-color: #d4edda;
+}
+
+/* 处理状态样式 */
+.processing-state .jspsych-ai-survey-ai-response {
+  border-color: #ffc107;
+  background-color: #fff3cd;
+}

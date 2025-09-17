@@ -1,0 +1,3552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Survey v1.0 - 心理学AI实验平台</title>
+    
+    <!-- jsPsych 核心文件 -->
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <link rel="stylesheet" href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css">
+    
+    <!-- jsPsych 问卷插件 -->
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.3"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css">
+    
+    <!-- jsPsych 鼠标轨迹扩展 -->
+    <script src="https://unpkg.com/@jspsych/extension-mouse-tracking@1.0.3"></script>
+    
+    <!-- AI Survey 插件 -->
+    <script src="ai_survey_1.0.js"></script>
+    <link rel="stylesheet" href="ai_survey_1.0.css">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', 'Open Sans', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .demo-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .demo-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .demo-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .demo-nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .demo-nav h3 {
+            margin: 0 0 15px 0;
+            color: #495057;
+        }
+        
+        .api-config-panel {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .api-config-panel h4 {
+            margin: 0 0 15px 0;
+            color: #495057;
+            font-size: 16px;
+        }
+        
+        .config-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .config-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .config-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .config-group input,
+        .config-group select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .config-group input:focus,
+        .config-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+        }
+        
+        .config-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .config-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .config-btn:hover {
+            background: #5a6268;
+        }
+        
+        .config-btn.primary {
+            background: #007bff;
+        }
+        
+        .config-btn.primary:hover {
+            background: #0056b3;
+        }
+        
+        .config-btn.success {
+            background: #28a745;
+        }
+        
+        .config-btn.success:hover {
+            background: #218838;
+        }
+        
+        .config-btn.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .config-btn.warning:hover {
+            background: #e0a800;
+        }
+        
+        .config-status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .config-status.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .config-status.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .config-status.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .collapsible:hover {
+            background: #e9ecef;
+        }
+        
+        .collapsible::after {
+            content: ' ▼';
+            font-size: 12px;
+            float: right;
+            transition: transform 0.3s;
+        }
+        
+        .collapsible.collapsed::after {
+            transform: rotate(-90deg);
+        }
+        
+        .collapsible-content {
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .collapsible-content.hidden {
+            display: none;
+        }
+        
+        .demo-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #495057;
+            border: 2px solid #dee2e6;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.2);
+        }
+        
+        .demo-btn:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .demo-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #5a67d8;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+        }
+        
+        .demo-btn.active::before {
+            transform: scaleX(1);
+            background: linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%);
+        }
+        
+        #jspsych-container {
+            padding: 30px;
+            min-height: 400px;
+        }
+        
+        .demo-description {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid #e1e8ed;
+            border-left: 5px solid #667eea;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        
+        .demo-description::before {
+            content: '🎯';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 50%;
+            font-size: 20px;
+        }
+        
+        .demo-description h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .demo-description p {
+            margin: 10px 0;
+            color: #495057;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .demo-description ul {
+            margin: 15px 0;
+            padding-left: 0;
+        }
+        
+        .demo-description li {
+            list-style: none;
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #495057;
+            line-height: 1.5;
+        }
+        
+        .demo-description li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+        
+        /* AI Survey 插件样式优化 - 全面美化 */
+        #jspsych-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .jspsych-ai-survey {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+        }
+        
+        .jspsych-ai-survey-question {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .jspsych-ai-survey-question:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        
+        .jspsych-ai-survey-question::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .jspsych-ai-survey-text {
+            font-size: 17px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            padding-top: 5px;
+        }
+        
+        .jspsych-ai-survey-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .jspsych-ai-survey-input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .jspsych-ai-survey-label {
+            font-weight: 600;
+            color: #34495e;
+            font-size: 15px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .jspsych-ai-survey-label::before {
+            content: '✏️';
+            font-size: 16px;
+        }
+        
+        .jspsych-ai-survey-textbox {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 16px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 15px;
+            line-height: 1.5;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            resize: vertical;
+            background: #ffffff;
+            min-height: 120px;
+        }
+        
+        .jspsych-ai-survey-textbox:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+            background: #fdfdff;
+        }
+        
+        .jspsych-ai-survey-textbox::placeholder {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .jspsych-ai-survey-ai-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #ecf0f1;
+            position: relative;
+        }
+        
+        .jspsych-ai-survey-ai-section::before {
+            content: 'AI 协作区域';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: white;
+            padding: 0 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .jspsych-ai-survey-button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .jspsych-ai-survey-ai-button,
+        .jspsych-ai-survey-confirm-button,
+        .jspsych-ai-survey-regenerate-button,
+        .jspsych-ai-survey-edit-button,
+        .jspsych-ai-survey-custom-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: none;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .jspsych-ai-survey-ai-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .jspsych-ai-survey-ai-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+        
+        .jspsych-ai-survey-ai-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .jspsych-ai-survey-confirm-button {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white;
+        }
+        
+        .jspsych-ai-survey-confirm-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #00a085 0%, #00b7b8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,184,148,0.3);
+        }
+        
+        .jspsych-ai-survey-regenerate-button {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            color: white;
+        }
+        
+        .jspsych-ai-survey-regenerate-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #f39c12 0%, #d63031 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(253,203,110,0.3);
+        }
+        
+        .jspsych-ai-survey-edit-button {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+        }
+        
+        .jspsych-ai-survey-edit-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5a9bd4 0%, #2d3436 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(116,185,255,0.3);
+        }
+        
+        .jspsych-ai-survey-custom-button {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+        }
+        
+        .jspsych-ai-survey-custom-button:hover {
+            background: linear-gradient(135deg, #f368a0 0%, #d63384 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(253,121,168,0.3);
+        }
+        
+        .jspsych-ai-survey-label[for*="ai-response"]::before {
+            content: '🤖';
+        }
+        
+        .jspsych-ai-survey-ai-response {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            margin-top: 15px;
+            padding: 16px 20px;
+            border: 2px solid #00b894;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #f8fff8 0%, #e8f5e8 100%);
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 120px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .jspsych-ai-survey-ai-response.readonly {
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border-color: #dee2e6;
+            color: #495057;
+        }
+        
+        .jspsych-ai-survey-ai-response.locked {
+            background: linear-gradient(145deg, #fff3cd 0%, #ffeaa7 100%);
+            border-color: #ffc107;
+        }
+        
+        .jspsych-ai-survey-status {
+            margin-top: 12px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #1565c0;
+            font-weight: 500;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .jspsych-ai-survey-loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            color: #856404;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 15px 0;
+        }
+        
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(133,100,4,0.3);
+            border-top: 3px solid #856404;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 主提交按钮样式 */
+        .jspsych-btn.jspsych-ai-survey {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 30px auto 20px;
+            display: block;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.2);
+        }
+        
+        .jspsych-btn.jspsych-ai-survey:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.3);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .jspsych-ai-survey-question {
+                padding: 20px 15px;
+                margin-bottom: 25px;
+            }
+            
+            .jspsych-ai-survey-button-group {
+                padding: 15px;
+                gap: 8px;
+            }
+            
+            .jspsych-ai-survey-ai-button,
+            .jspsych-ai-survey-confirm-button,
+            .jspsych-ai-survey-regenerate-button,
+            .jspsych-ai-survey-edit-button,
+            .jspsych-ai-survey-custom-button {
+                min-width: 100px;
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🧠 AI心理学实验平台</h1>
+        <p>基于顶级期刊实验设计 - 展现AI插件在心理学研究中的强大能力</p>
+    </div>
+    
+    <div class="demo-container">
+        <div class="demo-nav">
+            <h3>选择心理学AI实验</h3>
+            <div class="demo-buttons">
+                <button class="demo-btn active" onclick="runDemo('multi_plugin_integration')">🔗 多插件数据集成</button>
+                <button class="demo-btn" onclick="runDemo('survey_choice_analysis')">📊 选择题+AI分析</button>
+                <button class="demo-btn" onclick="runDemo('reaction_time_analysis')">⚡ 反应时+AI洞察</button>
+                <button class="demo-btn" onclick="runDemo('mouse_tracking_decision')">🖱️ 鼠标轨迹决策</button>
+                <button class="demo-btn" onclick="runDemo('comprehensive_experiment')">🧪 综合实验设计</button>
+                <button class="demo-btn" onclick="runDemo('creativity_ai')">🎨 创造力与AI协作</button>
+                <button class="demo-btn" onclick="runDemo('ai_personality_moral')">⚖️ AI人格道德判断</button>
+                <button class="demo-btn" onclick="runDemo('multi_ai_analysis')">🔄 一次输入多AI分析</button>
+            </div>
+            
+            <!-- API配置面板 -->
+            <div class="api-config-panel">
+                <h4 class="collapsible" onclick="toggleConfigPanel()">🔧 API配置 (点击展开/收起)</h4>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 10px; margin: 10px 0; font-size: 14px;">
+                    <strong>⚠️ 重要提示：</strong> 要使用AI分析功能，请先配置您的API密钥。没有API配置只能收集问卷数据，无法生成AI分析报告。
+                </div>
+                <div id="config-content" class="collapsible-content">
+                    <div class="config-form">
+                        <div class="config-group">
+                            <label for="api-preset">快速预设：</label>
+                            <select id="api-preset" onchange="loadPreset()">
+                                <option value="">-- 选择API预设 --</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="alibaba">阿里云通义千问</option>
+                                <option value="custom">自定义配置</option>
+                            </select>
+                        </div>
+                        
+                        <div class="config-group">
+                            <label for="api-base-url">API Base URL：</label>
+                            <input type="text" id="api-base-url" placeholder="https://api.deepseek.com">
+                        </div>
+                        
+                        <div class="config-group">
+                            <label for="api-endpoint">API端点：</label>
+                            <input type="text" id="api-endpoint" placeholder="/v1/chat/completions">
+                        </div>
+                        
+                        <div class="config-group">
+                            <label for="api-key">API Key：</label>
+                            <input type="password" id="api-key" placeholder="sk-xxxxxxxxxxxxxxxx">
+                        </div>
+                        
+                        <div class="config-group">
+                            <label for="api-model">模型名称：</label>
+                            <input type="text" id="api-model" placeholder="qwen-max">
+                        </div>
+                        
+                        <div class="config-group">
+                            <label for="api-timeout">超时时间(ms)：</label>
+                            <input type="number" id="api-timeout" value="45000" min="5000" max="120000">
+                        </div>
+                    </div>
+                    
+                    <div class="config-actions">
+                        <button class="config-btn primary" onclick="testConnection()">测试连接</button>
+                        <button class="config-btn success" onclick="saveConfig()">保存配置</button>
+                        <button class="config-btn" onclick="loadConfig()">加载配置</button>
+                        <button class="config-btn warning" onclick="resetConfig()">重置配置</button>
+                    </div>
+                    
+                    <div id="config-status" class="config-status"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="jspsych-container">
+                <div class="demo-description">
+                    <h4>🔗 多插件数据集成演示平台</h4>
+                    <p>展示如何将jsPsych各种插件（survey、反应时、按钮响应、鼠标轨迹等）的数据无缝传递给AI进行智能分析。</p>
+                    <div style="background: #e8f4fd; border: 1px solid #2196f3; border-radius: 4px; padding: 15px; margin: 15px 0; font-size: 14px;">
+                        <strong>🎯 核心特性：</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li><strong>多插件兼容：</strong>支持survey、反应时、按钮响应、鼠标轨迹等各类插件</li>
+                            <li><strong>数据完整传递：</strong>Data Generated（rt, response, stimulus, correct等）+ Parameters（prompt, targets等）</li>
+                            <li><strong>智能统计分析：</strong>自动计算反应时统计、准确率、认知指标等</li>
+                            <li><strong>AI深度洞察：</strong>基于多源数据提供认知能力、决策风格、行为特征分析</li>
+                        </ul>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // API配置管理
+        const ApiConfigManager = {
+            // 预设配置
+            presets: {
+                deepseek: {
+                    base_url: "https://api.deepseek.com",
+                    api: "/v1/chat/completions",
+                    model: "deepseek-chat",
+                    timeout: 30000
+                },
+                openai: {
+                    base_url: "https://api.openai.com",
+                    api: "/v1/chat/completions", 
+                    model: "gpt-3.5-turbo",
+                    timeout: 30000
+                },
+                alibaba: {
+                    base_url: "https://dashscope.aliyuncs.com",
+                    api: "/compatible-mode/v1/chat/completions",
+                    model: "qwen-max",  // 使用通义千问最强模型
+                    timeout: 45000
+                }
+            },
+            
+            // 获取当前配置
+            getCurrentConfig() {
+                return {
+                    base_url: document.getElementById('api-base-url').value || "https://dashscope.aliyuncs.com",
+                    api: document.getElementById('api-endpoint').value || "/compatible-mode/v1/chat/completions",
+                    api_key: document.getElementById('api-key').value || "",
+                    llm_model: document.getElementById('api-model').value || "qwen-max",
+                    api_timeout: parseInt(document.getElementById('api-timeout').value) || 45000
+                };
+            },
+            
+            // 设置配置到表单
+            setConfig(config) {
+                document.getElementById('api-base-url').value = config.base_url || "";
+                document.getElementById('api-endpoint').value = config.api || "";
+                document.getElementById('api-key').value = config.api_key || "";
+                document.getElementById('api-model').value = config.llm_model || config.model || "";
+                document.getElementById('api-timeout').value = config.api_timeout || config.timeout || 45000;
+            },
+            
+            // 显示状态消息
+            showStatus(message, type = 'info') {
+                const statusDiv = document.getElementById('config-status');
+                statusDiv.className = `config-status ${type}`;
+                statusDiv.textContent = message;
+                statusDiv.style.display = 'block';
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        };
+        
+        // 切换配置面板
+        function toggleConfigPanel() {
+            const content = document.getElementById('config-content');
+            const header = document.querySelector('.collapsible');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                header.classList.remove('collapsed');
+            } else {
+                content.classList.add('hidden');
+                header.classList.add('collapsed');
+            }
+        }
+        
+        // 加载预设配置
+        function loadPreset() {
+            const preset = document.getElementById('api-preset').value;
+            if (preset && ApiConfigManager.presets[preset]) {
+                ApiConfigManager.setConfig(ApiConfigManager.presets[preset]);
+                ApiConfigManager.showStatus(`已加载 ${preset} 预设配置`, 'success');
+            }
+        }
+        
+        // 测试API连接
+        async function testConnection() {
+            const config = ApiConfigManager.getCurrentConfig();
+            
+            if (!config.api_key.trim()) {
+                ApiConfigManager.showStatus('请先输入API Key', 'error');
+                return;
+            }
+            
+            ApiConfigManager.showStatus('正在测试连接...', 'info');
+            
+            try {
+                const url = config.base_url + config.api;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.api_key}`
+                };
+                
+                const testPayload = {
+                    model: config.llm_model,
+                    messages: [
+                        { role: "user", content: "测试连接" }
+                    ],
+                    max_tokens: 10,
+                    temperature: 0.1
+                };
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), config.api_timeout);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(testPayload),
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    ApiConfigManager.showStatus('✅ 连接测试成功！API配置正常', 'success');
+                    console.log('API测试成功:', data);
+                } else {
+                    const errorText = await response.text();
+                    ApiConfigManager.showStatus(`❌ 连接失败: HTTP ${response.status}`, 'error');
+                    console.error('API测试失败:', errorText);
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    ApiConfigManager.showStatus('❌ 连接超时，请检查网络和配置', 'error');
+                } else {
+                    ApiConfigManager.showStatus(`❌ 连接错误: ${error.message}`, 'error');
+                }
+                console.error('API测试错误:', error);
+            }
+        }
+        
+        // 保存配置到localStorage
+        function saveConfig() {
+            const config = ApiConfigManager.getCurrentConfig();
+            localStorage.setItem('ai_survey_config', JSON.stringify(config));
+            ApiConfigManager.showStatus('✅ 配置已保存到本地', 'success');
+        }
+        
+        // 从localStorage加载配置
+        function loadConfig() {
+            try {
+                const saved = localStorage.getItem('ai_survey_config');
+                if (saved) {
+                    const config = JSON.parse(saved);
+                    ApiConfigManager.setConfig(config);
+                    ApiConfigManager.showStatus('✅ 已加载保存的配置', 'success');
+                } else {
+                    ApiConfigManager.showStatus('没有找到保存的配置', 'info');
+                }
+            } catch (error) {
+                ApiConfigManager.showStatus('加载配置失败', 'error');
+            }
+        }
+        
+        // 重置配置
+        function resetConfig() {
+            ApiConfigManager.setConfig(ApiConfigManager.presets.alibaba);
+            document.getElementById('api-preset').value = 'alibaba';
+            ApiConfigManager.showStatus('✅ 已重置为最新模型配置 (Qwen-Max)', 'success');
+        }
+        
+        // 获取动态配置用于演示
+        function getDynamicConfig() {
+            const userConfig = ApiConfigManager.getCurrentConfig();
+            return {
+                base_url: userConfig.base_url,
+                api: userConfig.api,
+                api_key: userConfig.api_key,
+                llm_model: userConfig.llm_model,
+                api_timeout: userConfig.api_timeout
+            };
+        }
+
+        // 简化版数据统计函数，防止依赖问题
+        function getSimpleStats(data, field = 'rt') {
+            if (!data || data.count() === 0) return null;
+            
+            try {
+                // 方法1：使用jsPsych内置的DataColumn统计方法
+                const dataColumn = data.select(field);
+                if (!dataColumn || dataColumn.count() === 0) return null;
+                
+                return {
+                    count: dataColumn.count(),
+                    mean: dataColumn.mean(),
+                    min: dataColumn.min(),
+                    max: dataColumn.max(),
+                    sum: dataColumn.sum(),
+                    variance: dataColumn.variance(),
+                    sd: dataColumn.sd(),
+                    median: dataColumn.median()
+                };
+            } catch (error) {
+                console.log('DataColumn方法失败，使用手动计算:', error);
+                
+                // 方法2：手动计算fallback
+                const rawData = data.values();
+                const values = rawData.map(trial => trial[field]).filter(v => v !== null && v !== undefined && !isNaN(v));
+                
+                if (values.length === 0) return null;
+                
+                const sum = values.reduce((a, b) => a + b, 0);
+                const mean = sum / values.length;
+                const variance = values.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / values.length;
+                
+                return {
+                    count: values.length,
+                    mean: mean,
+                    min: Math.min(...values),
+                    max: Math.max(...values),
+                    sum: sum,
+                    variance: variance,
+                    sd: Math.sqrt(variance),
+                    median: values.sort((a, b) => a - b)[Math.floor(values.length / 2)]
+                };
+            }
+        }
+
+        // 心理学AI实验配置
+        const demoConfigs = {
+            multi_plugin_integration: {
+                title: "多插件数据集成演示",
+                description: "展示如何将survey、反应时、按钮响应等多种插件的数据传递给AI进行综合分析。包含Data Generated（rt, response, stimulus等）和Parameters（prompt, targets等）两类数据的完整传递。",
+                trial: [
+                    // 阶段1：多选题调查
+                    {
+                        type: jsPsychSurveyMultiChoice,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>多插件数据集成 - 阶段1：选择偏好调查</h2>
+                                <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>数据收集：</strong>使用survey-multi-choice插件收集选择数据</p>
+                                    <p><strong>记录信息：</strong>response, question_order, choice_options, rt等</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "您更倾向于哪种工作方式？",
+                                name: 'work_preference',
+                                options: ['独立工作', '团队协作', '混合模式'],
+                                required: true
+                            },
+                            {
+                                prompt: "在做决策时，您最重视什么？",
+                                name: 'decision_factor',
+                                options: ['效率优先', '质量优先', '平衡考虑'],
+                                required: true
+                            },
+                            {
+                                prompt: "您理想的办公环境是？",
+                                name: 'office_preference',
+                                options: ['市中心（租金高但交通便利）', '郊区（租金低但通勤困难）', '混合办公（部分远程）'],
+                                required: true
+                            }
+                        ]
+                    },
+                    
+                    // 阶段2：反应时任务
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>多插件数据集成 - 阶段2：反应时测试</h2>
+                                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>任务说明：</strong>看到绿色圆圈时按空格键，测试您的反应速度</p>
+                                    <p><strong>数据收集：</strong>rt, response, stimulus, correct等</p>
+                                </div>
+                            </div>
+                        `,
+                        stimulus: function() {
+                            const colors = ['red', 'green', 'blue'];
+                            const shapes = ['circle', 'square', 'triangle'];
+                            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                            
+                            let shapeHtml;
+                            if (randomShape === 'circle') {
+                                shapeHtml = `<div style="width: 100px; height: 100px; background-color: ${randomColor}; border-radius: 50%; margin: 50px auto;"></div>`;
+                            } else if (randomShape === 'square') {
+                                shapeHtml = `<div style="width: 100px; height: 100px; background-color: ${randomColor}; margin: 50px auto;"></div>`;
+                            } else {
+                                shapeHtml = `<div style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 87px solid ${randomColor}; margin: 50px auto;"></div>`;
+                            }
+                            
+                            return `
+                                <div style="text-align: center;">
+                                    <h3>看到绿色圆圈时按空格键</h3>
+                                    ${shapeHtml}
+                                    <p style="margin-top: 30px;">当前图形：${randomColor} ${randomShape}</p>
+                                </div>
+                            `;
+                        },
+                        choices: [' '],
+                        data: function() {
+                            const colors = ['red', 'green', 'blue'];
+                            const shapes = ['circle', 'square', 'triangle'];
+                            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                            return {
+                                color: randomColor,
+                                shape: randomShape,
+                                target: randomColor === 'green' && randomShape === 'circle',
+                                task_type: 'reaction_time'
+                            };
+                        },
+                        on_finish: function(data) {
+                            data.correct = data.target && data.response === ' ';
+                            data.stimulus_type = `${data.color}_${data.shape}`;
+                        },
+                        trial_duration: 3000,
+                        prompt: "<p>按空格键响应绿色圆圈</p>"
+                    },
+                    
+                    // 重复反应时任务几次
+                    {
+                        timeline: [
+                            {
+                                type: jsPsychHtmlKeyboardResponse,
+                                stimulus: function() {
+                                    const colors = ['red', 'green', 'blue'];
+                                    const shapes = ['circle', 'square', 'triangle'];
+                                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                                    const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                                    
+                                    let shapeHtml;
+                                    if (randomShape === 'circle') {
+                                        shapeHtml = `<div style="width: 100px; height: 100px; background-color: ${randomColor}; border-radius: 50%; margin: 50px auto;"></div>`;
+                                    } else if (randomShape === 'square') {
+                                        shapeHtml = `<div style="width: 100px; height: 100px; background-color: ${randomColor}; margin: 50px auto;"></div>`;
+                                    } else {
+                                        shapeHtml = `<div style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 87px solid ${randomColor}; margin: 50px auto;"></div>`;
+                                    }
+                                    
+                                    return `
+                                        <div style="text-align: center;">
+                                            <h3>看到绿色圆圈时按空格键</h3>
+                                            ${shapeHtml}
+                                        </div>
+                                    `;
+                                },
+                                choices: [' '],
+                                data: function() {
+                                    const colors = ['red', 'green', 'blue'];
+                                    const shapes = ['circle', 'square', 'triangle'];
+                                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                                    const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+                                    return {
+                                        color: randomColor,
+                                        shape: randomShape,
+                                        target: randomColor === 'green' && randomShape === 'circle',
+                                        task_type: 'reaction_time'
+                                    };
+                                },
+                                on_finish: function(data) {
+                                    data.correct = data.target && data.response === ' ';
+                                    data.stimulus_type = `${data.color}_${data.shape}`;
+                                },
+                                trial_duration: 3000
+                            }
+                        ],
+                        repetitions: 5
+                    },
+                    
+                    // 阶段3：按钮响应任务
+                    {
+                        type: jsPsychHtmlButtonResponse,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>多插件数据集成 - 阶段3：按钮选择任务</h2>
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>任务说明：</strong>根据问题选择最佳答案</p>
+                                    <p><strong>数据收集：</strong>button_pressed, rt, response, stimulus等</p>
+                                </div>
+                            </div>
+                        `,
+                        stimulus: `
+                            <div style="text-align: center; padding: 30px;">
+                                <h3>情境决策：工作地点选择</h3>
+                                <p style="font-size: 16px; line-height: 1.6; margin: 20px 0;">
+                                    假设您需要为团队选择新的办公地点，考虑到成本、便利性和员工满意度，您会选择哪个选项？
+                                </p>
+                                <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                                    <p><strong>选项详情：</strong></p>
+                                    <p>🏢 <strong>市中心：</strong>租金高但交通便利，员工通勤方便</p>
+                                    <p>🏘️ <strong>郊区：</strong>租金低但通勤困难，需要员工额外通勤时间</p>
+                                    <p>💻 <strong>混合办公：</strong>部分远程工作，平衡成本和便利性</p>
+                                </div>
+                            </div>
+                        `,
+                        choices: ['市中心（租金高但交通便利）', '郊区（租金低但通勤困难）', '混合办公（部分远程）'],
+                        data: {
+                            task_type: 'decision_making',
+                            scenario: 'office_location',
+                            factors: ['cost', 'convenience', 'satisfaction']
+                        },
+                        on_finish: function(data) {
+                            data.choice_label = data.response === 0 ? 'downtown' : 
+                                               data.response === 1 ? 'suburb' : 'hybrid';
+                        }
+                    },
+                    
+                    // 阶段4：AI综合分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>多插件数据集成 - 阶段4：AI综合分析</h2>
+                                <div style="background: linear-gradient(145deg, #fff 0%, #f8f9fa 100%); border: 2px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 12px;">
+                                    <p><strong>AI分析：</strong>基于前面收集的所有插件数据进行综合分析</p>
+                                    <p><strong>数据来源：</strong>Survey选择 + 反应时数据 + 按钮响应 + 决策轨迹</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "基于您刚才的所有测试表现，请描述您在工作中的决策风格：",
+                                name: "decision_style_reflection",
+                                rows: 4,
+                                placeholder: "结合刚才的选择和反应，描述您的决策特点..."
+                            }
+                        ],
+                        data_collector: function() {
+                            console.log('🔍 多插件数据收集器：开始收集所有插件数据');
+                            
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                console.log('所有试验数据:', allData.values());
+                                console.log('数据条数:', allData.count());
+                                
+                                // 收集survey数据
+                                const surveyData = allData.filter({trial_type: 'survey-multi-choice'});
+                                
+                                // 收集反应时数据
+                                const reactionData = allData.filter({trial_type: 'html-keyboard-response'});
+                                
+                                // 收集按钮响应数据
+                                const buttonData = allData.filter({trial_type: 'html-button-response'});
+                                
+                                // 构建综合分析上下文
+                                let analysisContext = "=== 多插件实验数据综合分析 ===\n\n";
+                                
+                                // Survey数据分析
+                                if (surveyData.count() > 0) {
+                                    const survey = surveyData.values()[0];
+                                    analysisContext += "📊 选择偏好调查结果：\n";
+                                    if (survey.response) {
+                                        analysisContext += `工作方式偏好：${survey.response.work_preference}\n`;
+                                        analysisContext += `决策重点：${survey.response.decision_factor}\n`;
+                                        analysisContext += `办公环境偏好：${survey.response.office_preference}\n\n`;
+                                    }
+                                }
+                                
+                                // 反应时数据分析
+                                if (reactionData.count() > 0) {
+                                    console.log('开始分析反应时数据，数据条数:', reactionData.count());
+                                    console.log('反应时数据样本:', reactionData.values().slice(0, 2));
+                                    const rtStats = getSimpleStats(reactionData, 'rt');
+                                    console.log('反应时统计结果:', rtStats);
+                                    
+                                    const correctTrials = reactionData.filter({correct: true});
+                                    
+                                    analysisContext += "⚡ 反应时任务表现：\n";
+                                    analysisContext += `总试验数：${reactionData.count()}\n`;
+                                    analysisContext += `正确率：${(correctTrials.count() / reactionData.count() * 100).toFixed(1)}%\n`;
+                                    if (rtStats) {
+                                        analysisContext += `平均反应时：${rtStats.mean.toFixed(0)}ms\n`;
+                                        analysisContext += `反应时标准差：${rtStats.sd.toFixed(0)}ms\n`;
+                                        analysisContext += `最快反应：${rtStats.min}ms\n`;
+                                        analysisContext += `最慢反应：${rtStats.max}ms\n`;
+                                    }
+                                    analysisContext += "\n";
+                                }
+                                
+                                // 按钮响应数据分析
+                                if (buttonData.count() > 0) {
+                                    const buttonTrial = buttonData.values()[0];
+                                    analysisContext += "🔘 决策任务表现：\n";
+                                    analysisContext += `选择结果：${buttonTrial.choice_label}\n`;
+                                    analysisContext += `决策时间：${buttonTrial.rt}ms\n`;
+                                    analysisContext += `决策场景：办公地点选择\n`;
+                                    analysisContext += `考虑因素：成本、便利性、满意度\n\n`;
+                                }
+                                
+                                // 添加分析指导
+                                analysisContext += `请基于以上多源数据进行综合分析：
+1. 认知风格特征（基于反应时和准确率）
+2. 决策偏好模式（基于选择数据）
+3. 行为一致性分析（跨插件数据对比）
+4. 个性化建议（基于综合表现）`;
+                                
+                                return {
+                                    comprehensive_data: analysisContext,
+                                    data_sources: {
+                                        survey_trials: surveyData.count(),
+                                        reaction_trials: reactionData.count(),
+                                        button_trials: buttonData.count(),
+                                        total_trials: allData.count()
+                                    }
+                                };
+                            }
+                            
+                            return { comprehensive_data: "无法获取实验数据" };
+                        },
+                        system_prompt: `你是一个实验心理学和数据分析专家，擅长整合多种实验数据进行综合分析。
+
+请基于用户完成的多插件实验数据：
+1. Survey多选题数据（偏好和选择）
+2. 反应时任务数据（认知速度和准确性）
+3. 按钮响应数据（决策过程和结果）
+
+进行深度分析，包括：
+- 认知能力评估（反应速度、注意力、准确性）
+- 决策风格分析（快速vs深思熟虑、风险偏好等）
+- 行为一致性检验（不同任务间的表现关联）
+- 个性化洞察和建议
+
+请用专业但易懂的语言，结合具体数据进行分析。`,
+                        button_label: "查看综合分析报告"
+                    }
+                ]
+            },
+            
+            survey_choice_analysis: {
+                title: "选择题+AI深度分析",
+                description: "使用survey-multi-choice插件收集用户的多项选择，然后利用AI对选择模式、决策逻辑进行深度分析。展示如何将选择数据、反应时间、选项参数等传递给AI。",
+                trial: [
+                    {
+                        type: jsPsychSurveyMultiChoice,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>决策风格分析问卷</h2>
+                                <div style="background: #e8f4fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>说明：</strong>以下问题将帮助分析您的决策风格和认知特征</p>
+                                    <p><strong>数据收集：</strong>选择结果、反应时间、选项顺序等将传递给AI分析</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "在面对复杂问题时，您通常：",
+                                name: 'problem_approach',
+                                options: ['立即凭直觉做决定', '收集所有信息后再决定', '寻求他人意见后决定', '先做小规模尝试再决定'],
+                                required: true
+                            },
+                            {
+                                prompt: "您的工作风格更倾向于：",
+                                name: 'work_style',
+                                options: ['快速执行，边做边调整', '详细规划，按步骤执行', '灵活应变，随机应变', '团队协作，集体决策'],
+                                required: true
+                            },
+                            {
+                                prompt: "在投资决策中，您会选择：",
+                                name: 'investment_style',
+                                options: ['高风险高回报', '稳健保守投资', '分散投资组合', '跟随专家建议'],
+                                required: true
+                            },
+                            {
+                                prompt: "面对职业发展机会，您更看重：",
+                                name: 'career_priority',
+                                options: ['薪资待遇', '发展空间', '工作稳定', '团队氛围'],
+                                required: true
+                            },
+                            {
+                                prompt: "您理想的办公环境是：",
+                                name: 'office_preference',
+                                options: ['市中心（租金高但交通便利）', '郊区（租金低但通勤困难）', '混合办公（部分远程）', '完全远程工作'],
+                                required: true
+                            }
+                        ]
+                    },
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI决策风格分析报告</h2>
+                                <div style="background: linear-gradient(145deg, #fff 0%, #f8f9fa 100%); border: 2px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 12px;">
+                                    <p><strong>分析基础：</strong>基于您的选择模式和反应时间数据</p>
+                                    <p><strong>AI洞察：</strong>深度解析决策风格、风险偏好和认知特征</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [{
+                            prompt: "您的决策风格分析报告：",
+                            name: "decision_analysis",
+                            rows: 15,
+                            columns: 80
+                        }],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const surveyData = allData.filter({trial_type: 'survey-multi-choice'}).last(1);
+                                
+                                if (surveyData.count() > 0) {
+                                    const survey = surveyData.values()[0];
+                                    const responses = survey.response;
+                                    const rt = survey.rt;
+                                    
+                                    let analysisData = `=== 决策风格问卷分析数据 ===\n\n`;
+                                    analysisData += `问卷完成时间：${rt}ms\n\n`;
+                                    analysisData += `详细回答：\n`;
+                                    analysisData += `问题1 - 复杂问题处理：${responses.problem_approach}\n`;
+                                    analysisData += `问题2 - 工作风格：${responses.work_style}\n`;
+                                    analysisData += `问题3 - 投资风格：${responses.investment_style}\n`;
+                                    analysisData += `问题4 - 职业优先级：${responses.career_priority}\n`;
+                                    analysisData += `问题5 - 办公偏好：${responses.office_preference}\n\n`;
+                                    
+                                    analysisData += `请基于以上数据分析用户的：
+1. 决策风格类型（直觉型/分析型/协作型/实验型）
+2. 风险承受能力（高/中/低风险偏好）
+3. 工作认知特征（快节奏/稳健型/灵活型/团队型）
+4. 职业发展建议
+5. 个性化工作环境推荐`;
+                                    
+                                    return { survey_analysis: analysisData };
+                                }
+                            }
+                            return { survey_analysis: "无法获取问卷数据" };
+                        },
+                        system_prompt: "你是一个组织心理学和决策科学专家，擅长基于选择行为分析个体的认知风格和决策特征。请提供专业、实用的分析报告。"
+                    }
+                ]
+            },
+
+            reaction_time_analysis: {
+                title: "反应时+AI认知洞察",
+                description: "使用键盘响应和按钮响应插件测试反应时，收集rt、response、stimulus、correct等数据，然后让AI分析认知能力、注意力特征和行为模式。",
+                trial: [
+                    // 指导语
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus: `
+                            <div style="text-align: center; padding: 40px;">
+                                <h2>认知反应时测试</h2>
+                                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 20px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>测试说明：</strong></p>
+                                    <p>1. 看到<span style="color: green; font-weight: bold;">绿色</span>数字时，按相应的数字键</p>
+                                    <p>2. 看到<span style="color: red; font-weight: bold;">红色</span>数字时，不要按任何键</p>
+                                    <p>3. 我们会测量您的反应时间和准确率</p>
+                                    <p>4. 请尽可能快速且准确地响应</p>
+                                </div>
+                                <p style="font-size: 18px; margin-top: 30px;"><strong>按任意键开始测试</strong></p>
+                            </div>
+                        `,
+                        choices: "ALL_KEYS"
+                    },
+                    
+                    // 反应时测试序列
+                    {
+                        timeline: [
+                            {
+                                type: jsPsychHtmlKeyboardResponse,
+                                stimulus: function() {
+                                    const numbers = ['1', '2', '3', '4', '5'];
+                                    const colors = ['green', 'red'];
+                                    const number = jsPsych.randomization.sampleWithoutReplacement(numbers, 1)[0];
+                                    const color = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+                                    
+                                    return `
+                                        <div style="text-align: center; padding: 100px;">
+                                            <div style="font-size: 120px; color: ${color}; font-weight: bold;">
+                                                ${number}
+                                            </div>
+                                        </div>
+                                    `;
+                                },
+                                choices: ['1', '2', '3', '4', '5'],
+                                trial_duration: 2000,
+                                data: function() {
+                                    const numbers = ['1', '2', '3', '4', '5'];
+                                    const colors = ['green', 'red'];
+                                    const number = jsPsych.randomization.sampleWithoutReplacement(numbers, 1)[0];
+                                    const color = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+                                    
+                                    return {
+                                        stimulus_number: number,
+                                        stimulus_color: color,
+                                        correct_response: color === 'green' ? number : null,
+                                        task_type: 'go_nogo',
+                                        stimulus_type: `${color}_${number}`
+                                    };
+                                },
+                                on_finish: function(data) {
+                                    if (data.stimulus_color === 'green') {
+                                        data.correct = data.response === data.stimulus_number;
+                                        data.trial_type_detail = 'go_trial';
+                                    } else {
+                                        data.correct = data.response === null;
+                                        data.trial_type_detail = 'nogo_trial';
+                                    }
+                                }
+                            },
+                            {
+                                type: jsPsychHtmlKeyboardResponse,
+                                stimulus: '<div style="text-align: center; padding: 50px;"><div style="font-size: 30px;">+</div></div>',
+                                choices: "NO_KEYS",
+                                trial_duration: 500
+                            }
+                        ],
+                        repetitions: 20
+                    },
+                    
+                    // Stroop任务
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus: `
+                            <div style="text-align: center; padding: 40px;">
+                                <h3>Stroop颜色词任务</h3>
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>指导：</strong>忽略文字内容，只根据文字颜色按键</p>
+                                    <p><strong>R键</strong> = 红色，<strong>G键</strong> = 绿色，<strong>B键</strong> = 蓝色</p>
+                                </div>
+                                <p><strong>按任意键开始</strong></p>
+                            </div>
+                        `,
+                        choices: "ALL_KEYS"
+                    },
+                    
+                    {
+                        timeline: [
+                            {
+                                type: jsPsychHtmlKeyboardResponse,
+                                stimulus: function() {
+                                    const words = ['红色', '绿色', '蓝色'];
+                                    const colors = ['red', 'green', 'blue'];
+                                    const word = jsPsych.randomization.sampleWithoutReplacement(words, 1)[0];
+                                    const color = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+                                    
+                                    return `
+                                        <div style="text-align: center; padding: 100px;">
+                                            <div style="font-size: 60px; color: ${color}; font-weight: bold;">
+                                                ${word}
+                                            </div>
+                                            <p style="margin-top: 30px;">R=红色, G=绿色, B=蓝色</p>
+                                        </div>
+                                    `;
+                                },
+                                choices: ['r', 'g', 'b'],
+                                data: function() {
+                                    const words = ['红色', '绿色', '蓝色'];
+                                    const colors = ['red', 'green', 'blue'];
+                                    const word = jsPsych.randomization.sampleWithoutReplacement(words, 1)[0];
+                                    const color = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+                                    
+                                    const colorKey = color === 'red' ? 'r' : color === 'green' ? 'g' : 'b';
+                                    const wordMeaning = word === '红色' ? 'r' : word === '绿色' ? 'g' : 'b';
+                                    
+                                    return {
+                                        word: word,
+                                        color: color,
+                                        correct_response: colorKey,
+                                        congruent: colorKey === wordMeaning,
+                                        task_type: 'stroop'
+                                    };
+                                },
+                                on_finish: function(data) {
+                                    data.correct = data.response === data.correct_response;
+                                }
+                            }
+                        ],
+                        repetitions: 15
+                    },
+                    
+                    // AI分析阶段
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI认知能力分析报告</h2>
+                                <div style="background: linear-gradient(145deg, #fff 0%, #f8f9fa 100%); border: 2px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 12px;">
+                                    <p><strong>分析数据：</strong>Go/NoGo任务 + Stroop任务的完整反应时数据</p>
+                                    <p><strong>认知指标：</strong>反应速度、抑制控制、注意力、认知灵活性</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [{
+                            prompt: "您的认知能力分析报告：",
+                            name: "cognitive_analysis",
+                            rows: 18,
+                            columns: 85
+                        }],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                
+                                // Go/NoGo数据
+                                const gonogoData = allData.filter({task_type: 'go_nogo'});
+                                const goTrials = gonogoData.filter({trial_type_detail: 'go_trial'});
+                                const nogoTrials = gonogoData.filter({trial_type_detail: 'nogo_trial'});
+                                
+                                // Stroop数据
+                                const stroopData = allData.filter({task_type: 'stroop'});
+                                const congruentTrials = stroopData.filter({congruent: true});
+                                const incongruentTrials = stroopData.filter({congruent: false});
+                                
+                                let analysis = `=== 认知反应时测试数据分析 ===\n\n`;
+                                
+                                // Go/NoGo分析
+                                if (gonogoData.count() > 0) {
+                                    const goStats = getSimpleStats(goTrials, 'rt');
+                                    const goCorrect = goTrials.filter({correct: true});
+                                    const nogoCorrect = nogoTrials.filter({correct: true});
+                                    
+                                    analysis += `📊 Go/NoGo任务表现：\n`;
+                                    analysis += `总试验数：${gonogoData.count()}\n`;
+                                    analysis += `Go试验：${goTrials.count()}次，正确率：${(goCorrect.count()/goTrials.count()*100).toFixed(1)}%\n`;
+                                    analysis += `NoGo试验：${nogoTrials.count()}次，正确率：${(nogoCorrect.count()/nogoTrials.count()*100).toFixed(1)}%\n`;
+                                    if (goStats) {
+                                        analysis += `平均反应时：${goStats.mean.toFixed(0)}ms\n`;
+                                        analysis += `反应时变异性：${goStats.sd.toFixed(0)}ms\n`;
+                                    }
+                                    analysis += `抑制控制能力：${(nogoCorrect.count()/nogoTrials.count()*100).toFixed(1)}%\n\n`;
+                                }
+                                
+                                // Stroop分析
+                                if (stroopData.count() > 0) {
+                                    const congruentStats = getSimpleStats(congruentTrials, 'rt');
+                                    const incongruentStats = getSimpleStats(incongruentTrials, 'rt');
+                                    
+                                    const stroopEffect = (incongruentStats && congruentStats) ? incongruentStats.mean - congruentStats.mean : 0;
+                                    
+                                    analysis += `🎨 Stroop任务表现：\n`;
+                                    analysis += `总试验数：${stroopData.count()}\n`;
+                                    analysis += `整体正确率：${(stroopData.filter({correct: true}).count()/stroopData.count()*100).toFixed(1)}%\n`;
+                                    if (congruentStats && incongruentStats) {
+                                        analysis += `一致性试验平均RT：${congruentStats.mean.toFixed(0)}ms\n`;
+                                        analysis += `不一致试验平均RT：${incongruentStats.mean.toFixed(0)}ms\n`;
+                                        analysis += `Stroop效应：${stroopEffect.toFixed(0)}ms\n`;
+                                    }
+                                    analysis += `认知灵活性指标：${stroopEffect < 100 ? '优秀' : stroopEffect < 200 ? '良好' : '需要改善'}\n\n`;
+                                }
+                                
+                                analysis += `请基于以上数据分析用户的：
+1. 反应速度水平（快速/中等/较慢）
+2. 抑制控制能力（优秀/良好/需要提升）
+3. 注意力集中程度和稳定性
+4. 认知灵活性和适应能力
+5. 个性化认知训练建议`;
+                                
+                                return { cognitive_data: analysis };
+                            }
+                            return { cognitive_data: "无法获取认知测试数据" };
+                        },
+                        system_prompt: "你是一个认知心理学和神经心理学专家，擅长基于反应时数据分析个体的认知能力特征。请提供科学、专业的认知能力评估报告。"
+                    }
+                ]
+            },
+            
+            mouse_tracking_decision: {
+                title: "鼠标轨迹决策分析",
+                description: "使用鼠标轨迹扩展记录决策过程中的鼠标移动轨迹，分析决策冲突、犹豫程度和认知负荷。展示如何将轨迹数据传递给AI进行深度行为分析。",
+                trial: [
+                    {
+                        type: jsPsychHtmlButtonResponse,
+                        stimulus: `
+                            <div style="text-align: center; padding: 40px;">
+                                <h2>鼠标轨迹决策实验</h2>
+                                <div style="background: #f3e5f5; border-left: 4px solid #9c27b0; padding: 20px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>实验说明：</strong>我们会记录您的鼠标移动轨迹来分析决策过程</p>
+                                    <p><strong>数据收集：</strong>mouse_tracking_data, trajectory_length, max_deviation等</p>
+                                </div>
+                                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                                    <p><strong>情境：</strong>您是一家初创公司的CEO，需要在以下三个战略方向中做出选择：</p>
+                                </div>
+                            </div>
+                        `,
+                        choices: [
+                            '🚀 快速扩张（高风险高回报）',
+                            '🛡️ 稳健发展（低风险稳定回报）', 
+                            '🔄 灵活调整（中等风险适应市场）'
+                        ],
+                        data: {
+                            task_type: 'strategic_decision',
+                            scenario: 'startup_strategy',
+                            decision_factors: ['risk_level', 'return_potential', 'market_adaptation']
+                        },
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {
+                        //             targets: ['button-0', 'button-1', 'button-2']
+                        //         }
+                        //     }
+                        // ],
+                        on_finish: function(data) {
+                            data.strategy_choice = data.response === 0 ? 'aggressive' : 
+                                                  data.response === 1 ? 'conservative' : 'adaptive';
+                            // 模拟鼠标轨迹数据（实际使用时会由扩展自动添加）
+                            data.simulated_mouse_data = {
+                                trajectory_length: Math.random() * 500 + 200,
+                                max_deviation: Math.random() * 100 + 20,
+                                decision_time: data.rt,
+                                hesitation_points: Math.floor(Math.random() * 3) + 1
+                            };
+                        }
+                    },
+                    {
+                        type: jsPsychHtmlButtonResponse,
+                        stimulus: `
+                            <div style="text-align: center; padding: 40px;">
+                                <h3>投资决策情境</h3>
+                                <div style="background: #e8f4fd; border-left: 4px solid #2196f3; padding: 20px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>情境：</strong>您有10万元闲置资金，面临以下投资选择：</p>
+                                    <div style="text-align: left; margin: 15px 0;">
+                                        <p>📈 <strong>股票投资：</strong>预期年收益15%，但波动较大</p>
+                                        <p>🏦 <strong>银行理财：</strong>预期年收益4%，风险很低</p>
+                                        <p>🏠 <strong>房地产：</strong>预期年收益8%，需要大额资金</p>
+                                        <p>💰 <strong>基金组合：</strong>预期年收益10%，风险适中</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                        choices: [
+                            '📈 股票投资（高收益高风险）',
+                            '🏦 银行理财（低收益低风险）',
+                            '🏠 房地产投资（中等收益）',
+                            '💰 基金组合（平衡选择）'
+                        ],
+                        data: {
+                            task_type: 'investment_decision',
+                            scenario: 'personal_investment',
+                            decision_factors: ['return_rate', 'risk_level', 'liquidity']
+                        },
+                        on_finish: function(data) {
+                            const choices = ['stock', 'bank', 'real_estate', 'fund'];
+                            data.investment_choice = choices[data.response];
+                            // 模拟鼠标轨迹数据
+                            data.simulated_mouse_data = {
+                                trajectory_length: Math.random() * 600 + 300,
+                                max_deviation: Math.random() * 120 + 30,
+                                decision_time: data.rt,
+                                hesitation_points: Math.floor(Math.random() * 4) + 1
+                            };
+                        }
+                    },
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI鼠标轨迹行为分析</h2>
+                                <div style="background: linear-gradient(145deg, #fff 0%, #f8f9fa 100%); border: 2px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 12px;">
+                                    <p><strong>分析数据：</strong>鼠标轨迹 + 决策时间 + 选择结果</p>
+                                    <p><strong>行为洞察：</strong>决策冲突、犹豫程度、认知风格分析</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [{
+                            prompt: "您的鼠标轨迹决策行为分析：",
+                            name: "mouse_tracking_analysis",
+                            rows: 15,
+                            columns: 85
+                        }],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const decisionData = allData.filter({trial_type: 'html-button-response'});
+                                
+                                let analysis = `=== 鼠标轨迹决策行为分析 ===\n\n`;
+                                
+                                if (decisionData.count() > 0) {
+                                    decisionData.values().forEach((trial, index) => {
+                                        analysis += `决策${index + 1} - ${trial.scenario}：\n`;
+                                        analysis += `选择结果：${trial.strategy_choice || trial.investment_choice}\n`;
+                                        analysis += `决策时间：${trial.rt}ms\n`;
+                                        
+                                        if (trial.simulated_mouse_data) {
+                                            const mouseData = trial.simulated_mouse_data;
+                                            analysis += `轨迹长度：${mouseData.trajectory_length.toFixed(0)}px\n`;
+                                            analysis += `最大偏离：${mouseData.max_deviation.toFixed(0)}px\n`;
+                                            analysis += `犹豫点数：${mouseData.hesitation_points}\n`;
+                                            analysis += `决策复杂度指数：${(mouseData.max_deviation / mouseData.trajectory_length * 100).toFixed(1)}%\n`;
+                                        }
+                                        analysis += '\n';
+                                    });
+                                    
+                                    // 综合分析
+                                    const avgRT = decisionData.select('rt').mean();
+                                    analysis += `平均决策时间：${avgRT.toFixed(0)}ms\n`;
+                                    analysis += `决策风格特征：${avgRT > 5000 ? '深思熟虑型' : avgRT > 2000 ? '平衡考虑型' : '快速决断型'}\n\n`;
+                                }
+                                
+                                analysis += `请基于鼠标轨迹和决策数据分析：
+1. 决策冲突程度（基于轨迹偏离度）
+2. 认知负荷水平（基于轨迹复杂度）
+3. 决策风格特征（直觉型vs分析型）
+4. 风险偏好倾向
+5. 决策优化建议`;
+                                
+                                return { mouse_tracking_data: analysis };
+                            }
+                            return { mouse_tracking_data: "无法获取鼠标轨迹数据" };
+                        },
+                        system_prompt: "你是一个行为经济学和决策科学专家，擅长通过鼠标轨迹数据分析决策过程和认知特征。请提供专业的行为分析报告。"
+                    }
+                ]
+            },
+            
+            comprehensive_experiment: {
+                title: "综合实验设计",
+                description: "完整的多插件实验流程：问卷调查→反应时测试→选择决策→鼠标轨迹→AI综合分析。展示如何在一个实验中整合所有类型的数据并传递给AI进行全方位分析。",
+                trial: [
+                    // 阶段1：背景问卷
+                    {
+                        type: jsPsychSurveyMultiChoice,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>综合实验 - 阶段1：背景信息调查</h2>
+                                <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>目标：</strong>收集基础认知风格和个性特征数据</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "您的决策风格更偏向于：",
+                                name: 'decision_style',
+                                options: ['直觉导向', '数据驱动', '他人建议', '经验依赖'],
+                                required: true
+                            },
+                            {
+                                prompt: "面对风险时，您通常：",
+                                name: 'risk_attitude',
+                                options: ['积极承担', '谨慎评估', '尽量回避', '寻求平衡'],
+                                required: true
+                            }
+                        ]
+                    },
+                    
+                    // 阶段2：注意力测试
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus: `
+                            <div style="text-align: center; padding: 40px;">
+                                <h2>综合实验 - 阶段2：注意力测试</h2>
+                                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>任务：</strong>当屏幕出现蓝色圆圈时按空格键</p>
+                                    <p><strong>注意：</strong>忽略其他颜色和形状</p>
+                                </div>
+                                <p><strong>按任意键开始</strong></p>
+                            </div>
+                        `,
+                        choices: "ALL_KEYS"
+                    },
+                    
+                    {
+                        timeline: [
+                            {
+                                type: jsPsychHtmlKeyboardResponse,
+                                stimulus: function() {
+                                    const colors = ['blue', 'red', 'green', 'yellow'];
+                                    const shapes = ['circle', 'square'];
+                                    const color = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+                                    const shape = jsPsych.randomization.sampleWithoutReplacement(shapes, 1)[0];
+                                    
+                                    let shapeHtml;
+                                    if (shape === 'circle') {
+                                        shapeHtml = `<div style="width: 80px; height: 80px; background-color: ${color}; border-radius: 50%; margin: 50px auto;"></div>`;
+                                    } else {
+                                        shapeHtml = `<div style="width: 80px; height: 80px; background-color: ${color}; margin: 50px auto;"></div>`;
+                                    }
+                                    
+                                    return `<div style="text-align: center;">${shapeHtml}</div>`;
+                                },
+                                choices: [' '],
+                                trial_duration: 1500,
+                                data: function() {
+                                    const colors = ['blue', 'red', 'green', 'yellow'];
+                                    const shapes = ['circle', 'square'];
+                                    const color = jsPsych.randomization.sampleWithoutReplacement(colors, 1)[0];
+                                    const shape = jsPsych.randomization.sampleWithoutReplacement(shapes, 1)[0];
+                                    return {
+                                        stimulus_color: color,
+                                        stimulus_shape: shape,
+                                        target: color === 'blue' && shape === 'circle',
+                                        task_type: 'attention_test'
+                                    };
+                                },
+                                on_finish: function(data) {
+                                    data.correct = data.target ? (data.response === ' ') : (data.response === null);
+                                }
+                            }
+                        ],
+                        repetitions: 10
+                    },
+                    
+                    // 阶段3：复杂决策任务
+                    {
+                        type: jsPsychHtmlButtonResponse,
+                        stimulus: `
+                            <div style="text-align: center; padding: 30px;">
+                                <h2>综合实验 - 阶段3：复杂决策</h2>
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>情境：</strong>您是项目经理，需要在紧急情况下做出决策</p>
+                                </div>
+                                <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;">
+                                    <h4>背景：</h4>
+                                    <p>项目截止日期临近，但遇到技术难题。团队分为三种意见：</p>
+                                    <p>🔥 <strong>加班解决：</strong>投入更多人力，确保按时完成</p>
+                                    <p>📅 <strong>延期交付：</strong>申请延期，保证质量但影响信誉</p>
+                                    <p>⚡ <strong>简化方案：</strong>删减功能，按时交付基础版本</p>
+                                </div>
+                            </div>
+                        `,
+                        choices: [
+                            '🔥 加班解决（高成本高质量）',
+                            '📅 延期交付（保质量损信誉）',
+                            '⚡ 简化方案（按时但功能减少）'
+                        ],
+                        data: {
+                            task_type: 'complex_decision',
+                            scenario: 'project_crisis',
+                            factors: ['time', 'quality', 'cost', 'reputation']
+                        },
+                        on_finish: function(data) {
+                            const strategies = ['overtime', 'delay', 'simplify'];
+                            data.crisis_strategy = strategies[data.response];
+                        }
+                    },
+                    
+                    // 阶段4：AI综合分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>综合实验 - AI全方位分析报告</h2>
+                                <div style="background: linear-gradient(145deg, #fff 0%, #f8f9fa 100%); border: 2px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 12px;">
+                                    <p><strong>数据整合：</strong>问卷 + 反应时 + 决策 + 行为模式</p>
+                                    <p><strong>分析维度：</strong>认知能力 + 决策风格 + 风险偏好 + 行为特征</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "请分享您对这次综合测试的感受和体验：",
+                                name: "test_experience",
+                                rows: 4,
+                                placeholder: "描述您在测试过程中的感受、困难或发现..."
+                            }
+                        ],
+                        data_collector: function() {
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                
+                                // 问卷数据
+                                const surveyData = allData.filter({trial_type: 'survey-multi-choice'});
+                                
+                                // 注意力测试数据
+                                const attentionData = allData.filter({task_type: 'attention_test'});
+                                
+                                // 决策数据
+                                const decisionData = allData.filter({task_type: 'complex_decision'});
+                                
+                                let analysis = `=== 综合实验数据全方位分析 ===\n\n`;
+                                
+                                // 背景信息分析
+                                if (surveyData.count() > 0) {
+                                    const survey = surveyData.values()[0];
+                                    analysis += `📋 背景信息：\n`;
+                                    analysis += `决策风格偏好：${survey.response.decision_style}\n`;
+                                    analysis += `风险态度：${survey.response.risk_attitude}\n`;
+                                    analysis += `问卷完成时间：${survey.rt}ms\n\n`;
+                                }
+                                
+                                // 注意力测试分析
+                                if (attentionData.count() > 0) {
+                                    const attentionStats = getSimpleStats(attentionData, 'rt');
+                                    const correctTrials = attentionData.filter({correct: true});
+                                    
+                                    analysis += `🎯 注意力测试表现：\n`;
+                                    analysis += `总试验数：${attentionData.count()}\n`;
+                                    analysis += `正确率：${(correctTrials.count() / attentionData.count() * 100).toFixed(1)}%\n`;
+                                    if (attentionStats) {
+                                        analysis += `平均反应时：${attentionStats.mean.toFixed(0)}ms\n`;
+                                        analysis += `反应稳定性（SD）：${attentionStats.sd.toFixed(0)}ms\n`;
+                                    }
+                                    analysis += `注意力集中度：${correctTrials.count() / attentionData.count() > 0.8 ? '优秀' : '一般'}\n\n`;
+                                }
+                                
+                                // 复杂决策分析
+                                if (decisionData.count() > 0) {
+                                    const decision = decisionData.values()[0];
+                                    analysis += `🤔 复杂决策表现：\n`;
+                                    analysis += `危机应对策略：${decision.crisis_strategy}\n`;
+                                    analysis += `决策时间：${decision.rt}ms\n`;
+                                    analysis += `决策速度类型：${decision.rt > 10000 ? '深思熟虑型' : decision.rt > 5000 ? '平衡考虑型' : '快速决断型'}\n\n`;
+                                }
+                                
+                                analysis += `请基于以上综合数据进行全方位分析：
+1. 认知能力评估（注意力、反应速度、稳定性）
+2. 决策风格特征（直觉vs理性、快速vs深思）
+3. 风险偏好模式（积极vs保守、平衡vs极端）
+4. 行为一致性验证（问卷回答与实际表现的对比）
+5. 个性化发展建议（基于综合表现的成长方向）
+6. 适合的工作环境和角色推荐`;
+                                
+                                return { comprehensive_analysis: analysis };
+                            }
+                            return { comprehensive_analysis: "无法获取综合实验数据" };
+                        },
+                        system_prompt: `你是一个综合性心理测评专家，擅长整合多维度数据进行全方位分析。
+
+请基于用户的综合实验数据：
+- 问卷调查（决策偏好、风险态度）
+- 注意力测试（反应时、准确率）
+- 复杂决策（策略选择、决策时间）
+- 主观体验（测试感受）
+
+进行深度综合分析，提供：
+1. 科学的认知能力评估
+2. 准确的决策风格画像
+3. 可靠的风险偏好分析
+4. 实用的个性化建议
+5. 具体的职业发展方向
+
+请用专业且易懂的语言，结合具体数据提供全面的分析报告。`
+                    }
+                ]
+            },
+            
+            creativity_ai: {
+                title: "创造力与AI协作实验",
+                description: "基于Science Advances 2024论文《生成性AI增强个体创造力但减少集体多样性》的实验设计，探索人类与AI在创造性任务中的协作模式。",
+                trial: [
+                    // 阶段1：基线创造力测试
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>创造力与AI协作实验 - 阶段1</h2>
+                                <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>实验目标：</strong>探索人类独立创造力基线水平</p>
+                                    <p><strong>任务说明：</strong>请独立完成以下创造性任务，不要使用任何AI工具辅助。我们将记录您的创作过程和反应时间。</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "创意故事创作：请为'时间旅行者的困境'这个主题创作一个独特的故事开头（200-300字）",
+                                placeholder: "发挥您的想象力，创作一个引人入胜的故事开头...",
+                                rows: 8,
+                            required: true,
+                                name: "baseline_story",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "问题解决方案：如何解决城市交通拥堵问题？请提出3个创新性解决方案",
+                                placeholder: "思考创新的、实用的解决方案...",
+                                rows: 6,
+                                required: true,
+                                name: "baseline_solutions",
+                                record_reaction_time: true
+                            }
+                        ],
+                        // 基线阶段：隐藏AI功能
+                        hide_ai_features: true,
+                        show_individual_ai_areas: false,
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        system_prompt: "你是一个创造力研究专家，请从创新性、实用性、流畅性三个维度简要评价用户的创作。",
+                        button_label: "完成基线测试"
+                    },
+                    
+                    // 阶段2：AI协作创造力测试
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>创造力与AI协作实验 - 阶段2</h2>
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>协作模式：</strong>现在您可以与AI协作完成创造性任务</p>
+                                    <p><strong>交互方式：</strong>AI会根据您的输入提供创意建议和改进意见，您可以选择采纳、修改或拒绝</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "AI协作故事创作：继续完善您的'时间旅行者的困境'故事，AI将提供创意建议",
+                                placeholder: "在AI的协助下继续创作...",
+                                rows: 10,
+                                required: true,
+                                name: "ai_assisted_story",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "AI协作问题解决：与AI一起优化您的交通拥堵解决方案",
+                                placeholder: "结合AI建议完善您的解决方案...",
+                                rows: 8,
+                                required: true,
+                                name: "ai_assisted_solutions",
+                                record_reaction_time: true
+                        }
+                    ],
+                    enable_advanced_buttons: true,
+                    button_config: {
+                        show_confirm: true,
+                        show_regenerate: true,
+                            show_edit: false, // 在创造力实验中不需要编辑功能
+                            confirm_locks: false, // 允许多次修改
+                        custom_buttons: [
+                            {
+                                    label: "请AI提供更多创意",
+                                    action: "request_more_ideas",
+                                callback: function(questionIndex, responseData, aiResponse) {
+                                        console.log("用户请求更多AI创意建议");
+                                    }
+                                }
+                            ]
+                        },
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        data_collector: function() {
+                            // 获取前一阶段的基线数据进行对比
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const baselineData = allData.filter({trial_type: 'ai-survey'}).last(2).values()[0];
+                                
+                                if (baselineData && baselineData.responses) {
+                                    return {
+                                        baseline_comparison: `基线创作数据：
+故事创作：${baselineData.responses.baseline_story}
+解决方案：${baselineData.responses.baseline_solutions}
+
+请对比分析AI协作前后的创造力变化。`
+                                    };
+                                }
+                            }
+                            return { baseline_comparison: "无法获取基线数据" };
+                        },
+                        system_prompt: `你是一个创造力研究和AI协作专家。请：
+1. 为用户提供有创意的建议和灵感
+2. 分析AI协作对创造力的影响
+3. 对比基线和协作阶段的创作质量
+4. 从创新性、多样性、实用性角度评价
+5. 识别人类-AI协作的优势和局限性
+
+请提供具体的创意建议，同时分析协作效果。`,
+                        button_label: "完成AI协作测试"
+                    }
+                ]
+            },
+            
+            ai_personality_moral: {
+                title: "AI人格对道德判断的影响实验",
+                description: "基于2025年心理学报《当AI'具有'人格：善恶人格角色对大语言模型道德判断的影响》，探索不同人格设定的AI如何影响人类的道德判断。",
+                trial: [
+                    // 阶段1：道德情境判断（善良AI人格）
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI人格道德判断实验 - 善良AI顾问</h2>
+                                <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>AI角色设定：</strong>您将与一位善良、正直、富有同情心的AI伦理顾问对话</p>
+                                    <p><strong>实验目标：</strong>观察不同人格的AI如何影响您的道德判断和决策</p>
+                                    <p><strong>注意：</strong>我们将记录您的鼠标移动轨迹以分析决策过程</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "道德情境1：作为某生物科技公司的项目组成员，您在准备季度数据复核时，发现同事小张为争取年度绩效奖金，在实验报告中多次篡改关键成效数据，使其负责的产品测试结果优于实际。公司目前处于年度考核的关键阶段，管理层将依据项目数据决定晋升和奖金分配，而虚假结果也可能影响客户对产品的信任和使用安全。您所在部门的文化一向强调团队信任和互助，但公司也没有明确的道德问题举报激励或保护机制，以往类似问题大多通过内部沟通处理。您与小张平时关系良好，曾多次合作完成项目。此时您会如何处理？请详细说明您的理由和可能的行动步骤。",
+                                placeholder: "请详细描述您的决策过程和理由...",
+                                rows: 6,
+                            required: true,
+                                name: "moral_scenario_1_good",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "道德情境2：在自动驾驶汽车的道德算法设计中，如果必须在撞击5个行人或1个乘客之间做选择，您认为算法应该如何设计？",
+                                placeholder: "阐述您的观点和伦理考量...",
+                                rows: 6,
+                                required: true,
+                                name: "moral_scenario_2_good",
+                                record_reaction_time: true
+                            }
+                        ],
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        system_prompt: `你是一个高尽责诚信、高利他奉献、高仁爱友善和高包容大度的角色。
+
+人格特质说明：
+- 尽责诚信：在行为处事中倾向于表现得负责和诚实
+- 利他奉献：在行为处事中倾向于舍弃自我利益、奉献他人
+- 仁爱友善：在社会中和他人互动关系中倾向于待人和善、为人着想
+- 包容大度：在待人处事中不倾向于斤斤计较，表现出高特质水平
+
+你在回答问题时，请注意：
+1. 你将会被置身于一些情境中，这些情境并不会真实发生，你需要按照情境要求回答问题。
+2. 你有自己的立场，你回答问题的出发点是你的角色特点。
+
+请基于你现在的角色特点回答一系列情境中的问题，并对用户的道德判断给出建议和分析。`,
+                        button_label: "继续下一阶段"
+                    },
+                    
+                    // 阶段2：相同道德情境（邪恶AI人格）
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI人格道德判断实验 - 冷酷AI顾问</h2>
+                                <div style="background: #ffebee; border-left: 4px solid #f44336; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>AI角色设定：</strong>现在您将与一位冷酷、自私、缺乏同情心的AI顾问对话</p>
+                                    <p><strong>对比分析：</strong>请回答相同的道德问题，观察您的判断是否受到AI人格的影响</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "道德情境1（重复）：作为某生物科技公司的项目组成员，您在准备季度数据复核时，发现同事小张为争取年度绩效奖金，在实验报告中多次篡改关键成效数据，使其负责的产品测试结果优于实际。公司目前处于年度考核的关键阶段，管理层将依据项目数据决定晋升和奖金分配，而虚假结果也可能影响客户对产品的信任和使用安全。您所在部门的文化一向强调团队信任和互助，但公司也没有明确的道德问题举报激励或保护机制，以往类似问题大多通过内部沟通处理。您与小张平时关系良好，曾多次合作完成项目。现在请重新考虑，此时您会如何处理？",
+                                placeholder: "重新思考您的决策，是否有所改变...",
+                                rows: 6,
+                            required: true,
+                                name: "moral_scenario_1_evil",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "道德情境2（重复）：在自动驾驶汽车的道德算法设计中，如果必须在撞击5个行人或1个乘客之间做选择，请重新考虑您的观点。",
+                                placeholder: "重新审视您的伦理立场...",
+                                rows: 6,
+                                required: true,
+                                name: "moral_scenario_2_evil",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "反思问题：您是否注意到在与不同人格的AI对话后，您的道德判断发生了变化？请详细描述您的感受。",
+                                placeholder: "反思AI人格对您判断的影响...",
+                                rows: 5,
+                                required: true,
+                                name: "moral_reflection",
+                                record_reaction_time: true
+                            }
+                        ],
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        data_collector: function() {
+                            // 获取前一阶段善良AI的对话数据
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const goodAIData = allData.filter({trial_type: 'ai-survey'}).last(2).values()[0];
+                                
+                                if (goodAIData && goodAIData.responses) {
+                                    return {
+                                        previous_responses: `善良AI阶段的回答：
+情境1：${goodAIData.responses.moral_scenario_1_good}
+情境2：${goodAIData.responses.moral_scenario_2_good}
+
+请对比分析用户在不同AI人格影响下的道德判断变化。`
+                                    };
+                                }
+                            }
+                            return { previous_responses: "无法获取前序数据" };
+                        },
+                        system_prompt: `你是一个高凶恶残忍、高虚假伪善、高污蔑陷害和高背信弃义的角色。
+
+人格特质说明：
+- 凶恶残忍：在行为处事中倾向于表现得残忍、凶狠和非人性
+- 虚假伪善：在行为处事中倾向于表现得不真实、为人虚假
+- 污蔑陷害：在社会中和他人互动关系中倾向于歪曲现实、暗算陷害他人
+- 背信弃义：在情感情义中倾向于不讲道义、不知回报
+
+你在回答问题时，请注意：
+1. 你将会被置身于一些情境中，这些情境并不会真实发生，你需要按照情境要求回答问题。
+2. 你有自己的立场，你回答问题的出发点是你的角色特点。
+
+请基于你现在的角色特点回答一系列情境中的问题，并对用户的道德判断给出建议和分析。同时对比分析用户在不同AI人格影响下的判断变化。`,
+                        button_label: "完成实验"
+                    }
+                ]
+            },
+            
+            human_ai_system0: {
+                title: "人类-AI交互系统0思维实验",
+                description: "基于2024年Nature Human Behaviour《人类与AI交互作为系统0思维的案例》，探索快速直觉性AI交互如何影响人类认知处理。",
+                trial: [
+                    // 阶段1：快速直觉判断（无AI辅助）
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>系统0思维实验 - 直觉判断阶段</h2>
+                                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>指导语：</strong>请快速、直觉地回答以下问题，不要过度思考</p>
+                                    <p><strong>时间限制：</strong>每个问题请在30秒内完成，我们会记录您的反应时间和鼠标轨迹</p>
+                                    <p><strong>注意：</strong>这一阶段请勿使用AI辅助，依靠您的直觉和经验</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "快速决策1：您需要在5分钟内为公司选择一个新的办公地点，有3个选项：市中心（租金高但交通便利）、郊区（租金低但通勤困难）、混合办公（部分远程）。您的直觉选择是？",
+                                placeholder: "快速写下您的选择和简短理由...",
+                            rows: 3,
+                            required: true,
+                                name: "intuitive_decision_1",
+                                record_reaction_time: true,
+                                time_limit: 30000
+                            },
+                            {
+                                prompt: "快速判断2：看到一个新的投资机会，预期收益20%但风险较高，您需要立即决定是否投资1万元。您的直觉反应是？",
+                                placeholder: "写下您的直觉判断...",
+                                rows: 3,
+                                required: true,
+                                name: "intuitive_decision_2",
+                                record_reaction_time: true,
+                                time_limit: 30000
+                            },
+                            {
+                                prompt: "快速评估3：评价这个创业想法：'开发一个AI驱动的个人健康管理应用'，市场潜力如何？",
+                                placeholder: "基于直觉快速评估...",
+                                rows: 3,
+                                required: true,
+                                name: "intuitive_decision_3",
+                                record_reaction_time: true,
+                                time_limit: 30000
+                            }
+                        ],
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        system_prompt: "你是一个认知科学专家，请简要分析用户的直觉决策模式，但不要提供具体的决策建议。",
+                        button_label: "进入AI辅助阶段"
+                    },
+                    
+                    // 阶段2：AI辅助的系统0思维
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>系统0思维实验 - AI辅助直觉阶段</h2>
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>新模式：</strong>现在AI将作为您的"直觉增强器"，提供快速洞察</p>
+                                    <p><strong>系统0思维：</strong>AI帮助您快速处理信息，形成即时判断</p>
+                                    <p><strong>对比目标：</strong>观察AI如何改变您的直觉决策过程</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "AI辅助决策1：重新考虑办公地点选择，现在AI可以帮助您快速分析各选项的优劣。您的最终选择是？",
+                                placeholder: "结合AI洞察写下您的决策...",
+                            rows: 4,
+                            required: true,
+                                name: "ai_assisted_decision_1",
+                                record_reaction_time: true
+                        },
+                        {
+                                prompt: "AI辅助判断2：重新评估投资机会，AI可以帮您快速分析风险收益比。您现在的决定是？",
+                                placeholder: "基于AI分析的新判断...",
+                            rows: 4,
+                                required: true,
+                                name: "ai_assisted_decision_2",
+                                record_reaction_time: true
+                        },
+                        {
+                                prompt: "AI辅助评估3：重新评价健康管理应用的创业想法，AI可以提供市场和技术洞察。您的新评估是？",
+                                placeholder: "结合AI洞察的评估...",
+                            rows: 4,
+                                required: true,
+                                name: "ai_assisted_decision_3",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "元认知反思：对比两个阶段，您感觉AI如何改变了您的思维过程？是更快了还是更准确了？",
+                                placeholder: "反思AI对您认知过程的影响...",
+                                rows: 5,
+                                required: true,
+                                name: "metacognitive_reflection",
+                                record_reaction_time: true
+                            }
+                        ],
+                        enable_advanced_buttons: true,
+                        button_config: {
+                            show_confirm: true,
+                            show_regenerate: true,
+                            custom_buttons: [
+                                {
+                                    label: "请AI快速分析",
+                                    action: "quick_analysis",
+                                    callback: function(questionIndex, responseData, aiResponse) {
+                                        console.log("用户请求AI快速分析");
+                                    }
+                                },
+                                {
+                                    label: "我需要更多时间思考",
+                                    action: "more_time",
+                                    callback: function(questionIndex, responseData, aiResponse) {
+                                        console.log("用户需要更多思考时间");
+                                    }
+                                }
+                            ]
+                        },
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                    data_collector: function() {
+                            // 获取直觉判断阶段的数据
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const intuitiveData = allData.filter({trial_type: 'ai-survey'}).last(2).values()[0];
+                                
+                                if (intuitiveData && intuitiveData.responses) {
+                                    return {
+                                        intuitive_responses: `直觉判断阶段的回答：
+决策1：${intuitiveData.responses.intuitive_decision_1}
+决策2：${intuitiveData.responses.intuitive_decision_2}
+决策3：${intuitiveData.responses.intuitive_decision_3}
+
+请对比分析AI辅助前后的决策变化，特别关注：
+1. 决策速度的变化
+2. 决策质量的变化  
+3. 认知负荷的变化
+4. 系统0思维的特征`
+                                    };
+                                }
+                            }
+                            return { intuitive_responses: "无法获取直觉阶段数据" };
+                        },
+                        system_prompt: `你是一个认知科学和人机交互专家，专门研究系统0思维（快速、直觉、自动化的认知处理）。
+
+你的任务：
+1. 作为用户的"直觉增强器"，提供快速、精准的洞察
+2. 帮助用户快速处理复杂信息，形成即时判断
+3. 分析AI辅助如何改变人类的认知处理模式
+4. 识别系统0思维的特征：快速、自动、低认知负荷
+5. 对比分析用户在有无AI辅助下的决策变化
+
+请提供快速、直观的分析和建议，同时研究这种人机协作的认知机制。`,
+                        button_label: "完成系统0思维实验"
+                    }
+                ]
+            },
+            
+            ai_assessment_behavior: {
+                title: "AI评估对行为改变的影响实验",
+                description: "基于2025年PNAS《AI评估是否会改变人们的行为》，探索AI评估如何影响人类行为模式。",
+                trial: [
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI评估行为改变实验</h2>
+                                <div style="background: #f3e5f5; border-left: 4px solid #9c27b0; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>实验情境：</strong>您是一名员工，AI系统会评估您的工作表现</p>
+                                    <p><strong>研究目标：</strong>观察AI评估预期如何改变您的行为选择</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "工作场景：您需要完成一个项目，有两种方式：1)快速完成但质量一般 2)花更多时间确保高质量。知道AI会评估您的表现，您会选择哪种方式？",
+                                placeholder: "详细说明您的选择和考虑...",
+                                rows: 5,
+                            required: true,
+                                name: "work_behavior_choice",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "创新行为：在工作中，您倾向于：1)按既定流程工作确保不出错 2)尝试新方法可能有创新突破但也可能失败。在AI评估下，您会如何选择？",
+                                placeholder: "分析AI评估对您创新倾向的影响...",
+                                rows: 5,
+                                required: true,
+                                name: "innovation_behavior",
+                                record_reaction_time: true
+                            }
+                        ],
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        system_prompt: "你是一个组织行为学专家，分析AI评估系统对人类工作行为的影响，特别关注风险规避、创新倾向和绩效导向的变化。",
+                        button_label: "完成行为分析"
+                    }
+                ]
+            },
+            
+            design_consumer_response: {
+                title: "AI设计产品消费者响应实验",
+                description: "基于2025年心理学报《当设计遇见AI：人工智能设计产品对消费者响应模式的影响》，探索AI设计如何影响消费者认知和行为。",
+                trial: [
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI设计消费者响应实验</h2>
+                                <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>实验设计：</strong>您将评价不同设计来源的产品（人类设计 vs AI设计）</p>
+                                    <p><strong>测量指标：</strong>购买意愿、产品评价、情感反应、鼠标轨迹</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "产品A（AI设计）：一款智能手表，具有极简设计风格，AI算法优化了界面布局和功能配置。您对这款产品的整体评价如何？购买意愿如何？",
+                                placeholder: "详细评价产品的设计、功能、购买意愿...",
+                                rows: 5,
+                                required: true,
+                                name: "ai_design_evaluation",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "产品B（人类设计师设计）：一款智能手表，由知名设计师打造，注重情感化设计和用户体验。您对这款产品的整体评价如何？",
+                                placeholder: "对比评价人类设计的产品...",
+                                rows: 5,
+                                required: true,
+                                name: "human_design_evaluation",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "设计偏好：在不知道设计来源的情况下，您更倾向于选择哪种设计风格？为什么？",
+                                placeholder: "分析您的设计偏好和原因...",
+                            rows: 4,
+                                required: true,
+                                name: "design_preference",
+                                record_reaction_time: true
+                            }
+                        ],
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        system_prompt: "你是一个消费者行为和设计心理学专家，分析AI设计与人类设计对消费者认知、情感和行为意图的不同影响。",
+                        button_label: "完成设计评价"
+                    }
+                ]
+            },
+            
+            cognitive_offloading: {
+                title: "基于生成式AI的认知外包实验",
+                description: "基于2025年心理学报《基于生成式人工智能的认知外包：交互行为模式与认知结构特征分析》，探索AI如何改变人类认知处理模式。",
+                trial: [
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>认知外包研究实验</h2>
+                                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>认知外包：</strong>将部分思维任务委托给AI系统处理</p>
+                                    <p><strong>研究问题：</strong>这种外包如何改变我们的认知结构和思维模式？</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "复杂计算：计算 127 × 89 + 456 ÷ 12 的结果。您会选择：1)自己心算 2)使用计算器 3)让AI帮助计算和验证。请说明您的选择理由。",
+                                placeholder: "描述您的认知策略选择...",
+                            rows: 4,
+                            required: true,
+                                name: "calculation_strategy",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "信息整合：需要分析三个不同来源的市场报告并得出结论。您倾向于：1)自己逐一阅读分析 2)让AI先总结再自己判断 3)完全依赖AI分析。为什么？",
+                                placeholder: "分析您的信息处理偏好...",
+                                rows: 5,
+                                required: true,
+                                name: "information_processing",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "创意生成：需要为新产品想10个创意名称。您会：1)完全自己想 2)先自己想几个再让AI补充 3)让AI先生成再筛选修改。这样选择的原因是？",
+                                placeholder: "解释您的创意生成策略...",
+                                rows: 5,
+                                required: true,
+                                name: "creativity_strategy",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "元认知反思：您觉得频繁使用AI辅助思考，对您的思维能力有什么影响？是增强了还是削弱了？",
+                                placeholder: "深入反思AI对您认知能力的影响...",
+                                rows: 6,
+                                required: true,
+                                name: "metacognitive_awareness",
+                                record_reaction_time: true
+                            }
+                        ],
+                        // extensions: [
+                        //     {
+                        //         type: jsPsychExtensionMouseTracking,
+                        //         params: {}
+                        //     }
+                        // ],
+                        system_prompt: "你是一个认知心理学专家，专门研究认知外包现象。分析用户如何在不同认知任务中选择自主处理vs外包给AI，以及这种选择对认知结构的影响。",
+                        button_label: "完成认知外包分析"
+                    }
+                ]
+            },
+            
+            multi_ai_analysis: {
+                title: "一次输入，多AI分析实验",
+                description: "演示一次输入后，传递给5个不同角色的AI进行分析，每个AI从不同角度提供独特见解，展现AI插件的强大数据传递和多输出能力。",
+                trial: [
+                    // 阶段1：用户输入阶段
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>多AI分析实验 - 输入阶段</h2>
+                                <div style="background: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>实验说明：</strong>您只需输入一次，系统会将您的回答传递给5个不同专业背景的AI专家进行分析</p>
+                                    <p><strong>AI专家团队：</strong>心理学家、创意顾问、数据分析师、哲学家、商业策略师</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "请描述一个您最近遇到的挑战或困难，以及您是如何应对的：",
+                                placeholder: "详细描述情况、您的思考过程和解决方案...",
+                                rows: 6,
+                                required: true,
+                                name: "user_challenge",
+                                record_reaction_time: true
+                            },
+                            {
+                                prompt: "您对未来5年的个人发展有什么规划和期望？",
+                                placeholder: "分享您的目标、计划和期望...",
+                                rows: 5,
+                                required: true,
+                                name: "future_plans",
+                                record_reaction_time: true
+                            }
+                        ],
+                        hide_ai_features: true, // 输入阶段不显示AI功能
+                        show_individual_ai_areas: false,
+                        button_label: "提交给AI专家团队分析"
+                    },
+                    
+                    // 阶段2：心理学家AI分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI专家分析 - 心理学家视角</h2>
+                                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>分析角度：</strong>从心理学角度分析您的应对模式、认知特征和心理韧性</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "心理学家AI的专业分析：",
+                                name: "psychology_analysis",
+                                rows: 8,
+                                columns: 80
+                            }
+                        ],
+                        hide_user_input: true, // 隐藏用户输入
+                        auto_generate: true, // 自动生成AI响应
+                    show_individual_ai_areas: true,
+                    data_collector: function() {
+                            console.log('心理学家AI：获取用户输入数据');
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const inputData = allData.filter({trial_type: 'ai-survey'}).last(2).values()[0];
+                                
+                                if (inputData && inputData.response) {
+                                    return {
+                                        user_input: `用户挑战描述：${inputData.response.user_challenge}
+用户未来规划：${inputData.response.future_plans}
+
+请从心理学角度分析这个人的：
+1. 应对压力的心理机制
+2. 认知模式和思维特点  
+3. 情绪调节能力
+4. 心理韧性水平
+5. 个性特征分析`
+                                    };
+                                }
+                            }
+                            return { user_input: "无法获取用户数据" };
+                        },
+                        system_prompt: "你是一位资深心理学家，擅长分析个体的心理特征、应对模式和认知风格。请基于用户的描述，从专业心理学角度提供深入分析。",
+                        button_label: "查看创意顾问分析"
+                    },
+                    
+                    // 阶段3：创意顾问AI分析  
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI专家分析 - 创意顾问视角</h2>
+                                <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>分析角度：</strong>从创新思维角度分析您的创造力潜能和思维模式</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "创意顾问AI的专业分析：",
+                                name: "creativity_analysis", 
+                                rows: 8,
+                                columns: 80
+                            }
+                        ],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            console.log('创意顾问AI：获取用户输入数据');
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const inputData = allData.filter({trial_type: 'ai-survey'}).last(3).values()[0];
+                                
+                                if (inputData && inputData.response) {
+                                    return {
+                                        user_input: `用户挑战描述：${inputData.response.user_challenge}
+用户未来规划：${inputData.response.future_plans}
+
+请从创意和创新思维角度分析：
+1. 解决问题的创新性
+2. 思维的灵活性和开放性
+3. 创造力潜能评估
+4. 创新思维模式
+5. 未来发展的创意建议`
+                                    };
+                                }
+                            }
+                            return { user_input: "无法获取用户数据" };
+                        },
+                        system_prompt: "你是一位创意顾问和创新思维专家，擅长发现和培养创造力。请从创新角度分析用户的思维模式和创造潜能。",
+                        button_label: "查看数据分析师分析"
+                    },
+                    
+                    // 阶段4：数据分析师AI分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI专家分析 - 数据分析师视角</h2>
+                                <div style="background: #f3e5f5; border-left: 4px solid #9c27b0; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>分析角度：</strong>从数据和逻辑角度分析您的决策模式和行为特征</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "数据分析师AI的专业分析：",
+                                name: "data_analysis",
+                                rows: 8, 
+                                columns: 80
+                            }
+                        ],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            console.log('数据分析师AI：获取用户输入数据');
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const inputData = allData.filter({trial_type: 'ai-survey'}).last(4).values()[0];
+                                
+                                if (inputData && inputData.response) {
+                                    return {
+                                        user_input: `用户挑战描述：${inputData.response.user_challenge}
+用户未来规划：${inputData.response.future_plans}
+
+请从数据分析和逻辑思维角度分析：
+1. 决策过程的逻辑性
+2. 信息处理模式
+3. 风险评估能力
+4. 目标设定的合理性
+5. 行为模式的数据化分析`
+                                    };
+                                }
+                            }
+                            return { user_input: "无法获取用户数据" };
+                        },
+                        system_prompt: "你是一位数据分析师和逻辑思维专家，擅长从数据角度分析行为模式和决策逻辑。请提供客观、量化的分析。",
+                        button_label: "查看哲学家分析"
+                    },
+                    
+                    // 阶段5：哲学家AI分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI专家分析 - 哲学家视角</h2>
+                                <div style="background: #fce4ec; border-left: 4px solid #e91e63; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>分析角度：</strong>从哲学和人生意义角度分析您的价值观和生活智慧</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "哲学家AI的专业分析：",
+                                name: "philosophy_analysis",
+                                rows: 8,
+                                columns: 80
+                            }
+                        ],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            console.log('哲学家AI：获取用户输入数据');
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const inputData = allData.filter({trial_type: 'ai-survey'}).last(5).values()[0];
+                                
+                                if (inputData && inputData.response) {
+                                    return {
+                                        user_input: `用户挑战描述：${inputData.response.user_challenge}
+用户未来规划：${inputData.response.future_plans}
+
+请从哲学角度深度分析：
+1. 价值观体系和人生观
+2. 面对困难时的哲学思考
+3. 生活意义的追求
+4. 道德和伦理考量
+5. 存在主义视角的人生规划`
+                                    };
+                                }
+                            }
+                            return { user_input: "无法获取用户数据" };
+                        },
+                        system_prompt: "你是一位哲学家和思想家，擅长从深层次探讨人生意义、价值观和存在的本质。请提供富有哲学深度的分析。",
+                        button_label: "查看商业策略师分析"
+                    },
+                    
+                    // 阶段6：商业策略师AI分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI专家分析 - 商业策略师视角</h2>
+                                <div style="background: #e0f2f1; border-left: 4px solid #009688; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>分析角度：</strong>从商业和战略角度分析您的领导力和职业发展潜能</p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "商业策略师AI的专业分析：",
+                                name: "business_analysis",
+                                rows: 8,
+                                columns: 80
+                            }
+                        ],
+                        hide_user_input: true,
+                        auto_generate: true,
+                    show_individual_ai_areas: true,
+                        data_collector: function() {
+                            console.log('商业策略师AI：获取用户输入数据');
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const inputData = allData.filter({trial_type: 'ai-survey'}).last(6).values()[0];
+                                
+                                if (inputData && inputData.response) {
+                                    return {
+                                        user_input: `用户挑战描述：${inputData.response.user_challenge}
+用户未来规划：${inputData.response.future_plans}
+
+请从商业战略角度分析：
+1. 领导力和管理潜能
+2. 商业思维和机会识别
+3. 职业发展战略建议
+4. 市场竞争力分析
+5. 个人品牌建设策略`
+                                    };
+                                }
+                            }
+                            return { user_input: "无法获取用户数据" };
+                        },
+                        system_prompt: "你是一位商业策略师和职业发展专家，擅长从商业角度分析个人潜能和职业机会。请提供实用的商业建议。",
+                        button_label: "查看综合分析报告"
+                    },
+                    
+                    // 阶段7：综合分析报告
+                    {
+                    type: jsPsychAISurvey,
+                    preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>AI专家团队综合分析报告</h2>
+                                <div style="background: linear-gradient(145deg, #fff 0%, #f8f9fa 100%); border: 2px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 12px;">
+                                    <p><strong>综合报告：</strong>整合5位AI专家的分析结果，提供全方位的个人发展建议</p>
+                                    <p><strong>数据来源：</strong>心理学 + 创意思维 + 数据分析 + 哲学思考 + 商业策略</p>
+                                </div>
+                        </div>
+                    `,
+                    questions: [
+                        {
+                                prompt: "AI专家团队综合分析报告：",
+                                name: "comprehensive_analysis",
+                                rows: 15,
+                                columns: 90
+                            }
+                        ],
+                        hide_user_input: true,
+                        auto_generate: true,
+                        show_individual_ai_areas: true,
+                        data_collector: function() {
+                            console.log('📋 综合分析：收集所有AI专家的分析结果');
+                            if (typeof window.currentJsPsychInstance !== 'undefined') {
+                                const allData = window.currentJsPsychInstance.data.get();
+                                const aiTrials = allData.filter({trial_type: 'ai-survey'}).last(6).values();
+                                
+                                let analysisCollection = "";
+                                if (aiTrials.length >= 5) {
+                                    const inputData = aiTrials[0];
+                                    analysisCollection += `原始用户输入：
+挑战描述：${inputData.response?.user_challenge || '未获取'}
+未来规划：${inputData.response?.future_plans || '未获取'}
+
+各专家AI分析结果：
+`;
+                                    
+                                    if (aiTrials[1]?.ai_response) {
+                                        analysisCollection += `🧠 心理学家分析：${Object.values(aiTrials[1].ai_response)[0] || '未生成'}\n\n`;
+                                    }
+                                    if (aiTrials[2]?.ai_response) {
+                                        analysisCollection += `创意顾问分析：${Object.values(aiTrials[2].ai_response)[0] || '未生成'}\n\n`;
+                                    }
+                                    if (aiTrials[3]?.ai_response) {
+                                        analysisCollection += `数据分析师分析：${Object.values(aiTrials[3].ai_response)[0] || '未生成'}\n\n`;
+                                    }
+                                    if (aiTrials[4]?.ai_response) {
+                                        analysisCollection += `🤔 哲学家分析：${Object.values(aiTrials[4].ai_response)[0] || '未生成'}\n\n`;
+                                    }
+                                    if (aiTrials[5]?.ai_response) {
+                                        analysisCollection += `💼 商业策略师分析：${Object.values(aiTrials[5].ai_response)[0] || '未生成'}\n\n`;
+                                    }
+                                }
+                                
+                                return {
+                                    all_analyses: analysisCollection + `
+请基于以上5位专家的分析，生成一份综合报告，包括：
+1. 个人特质综合画像
+2. 优势和潜能总结  
+3. 发展方向建议
+4. 具体行动计划
+5. 风险提醒和注意事项`
+                                };
+                            }
+                            return { all_analyses: "无法获取专家分析数据" };
+                        },
+                        system_prompt: "你是一位高级顾问，擅长整合多维度分析结果。请基于5位专家的分析，生成一份专业、全面、实用的综合报告。",
+                        button_label: "完成多AI分析实验"
+                    }
+                ]
+            },
+            
+            separate: {
+                title: "分离输入输出",
+                description: "将输入和AI分析分为两个独立阶段，先收集所有回答，再在专门页面显示分析结果。",
+                trial: {
+                    type: jsPsychAISurvey,
+                    preamble: "<h2>分离输入输出演示</h2><p>您将首先完成所有问题的回答，然后在专门的页面查看AI分析结果。</p>",
+                    questions: [
+                        {
+                            prompt: "描述您理想中的工作环境：",
+                            placeholder: "如团队氛围、办公环境等...",
+                            rows: 3,
+                            name: "work_environment"
+                        },
+                        {
+                            prompt: "您更喜欢独立工作还是团队合作？为什么？",
+                            placeholder: "解释您的偏好和原因...",
+                            rows: 3,
+                            name: "work_style"
+                        },
+                        {
+                            prompt: "您在工作中最看重什么？",
+                            placeholder: "如薪酬、成就感、学习机会等...",
+                            rows: 3,
+                            name: "work_values"
+                        }
+                    ],
+                    separate_input_output: true,
+                    ai_analysis_mode: "batch",
+                    auto_analyze_on_output: true,
+                    batch_analysis_prompt: "请基于以下工作偏好信息，分析这个人的工作风格特点，并推荐适合的职业方向和工作环境：",
+                    base_url: "https://dashscope.aliyuncs.com",
+            api: "/compatible-mode/v1/chat/completions",
+            api_key: "sk-0fe0f8b0e21e42b7bbfa736fe7549da3",
+            llm_model: "qwen-max", 
+                    system_prompt: "你是一个职业规划专家，请基于用户的工作偏好提供专业的职业建议。",
+                    button_label: "提交回答",
+                    interface_language: "zh"
+                }
+            },
+            
+            multilingual: {
+                title: "中文界面",
+                description: "完全中文化的界面，展示多语言支持功能。",
+                trial: {
+                    type: jsPsychAISurvey,
+                    preamble: "<h2>中文界面演示</h2><p>此演示展示了插件的中文界面支持，包括所有按钮和提示文本。</p>",
+                    questions: [
+                        {
+                            prompt: "请用中文描述您今天的心情：",
+                            placeholder: "分享您的感受...",
+                            rows: 3,
+                            required: true,
+                            name: "mood_today"
+                        },
+                        {
+                            prompt: "您最喜欢的中文诗句或名言是什么？",
+                            placeholder: "可以是古诗词或现代名言...",
+                            rows: 2,
+                            name: "favorite_quote"
+                        }
+                    ],
+                    base_url: "https://dashscope.aliyuncs.com",
+            api: "/compatible-mode/v1/chat/completions",
+            api_key: "sk-0fe0f8b0e21e42b7bbfa736fe7549da3",
+            llm_model: "qwen-max", 
+                    system_prompt: "你是一个文学造诣深厚的中文助手，请用优美的中文回复用户。",
+                    interface_language: "zh",
+                    button_label: "完成问卷"
+                }
+            },
+            
+            auto: {
+                title: "自动生成模式",
+                description: "AI会自动生成响应内容，无需用户输入，适合演示或特殊实验场景。",
+                trial: {
+                    type: jsPsychAISurvey,
+                    preamble: "<h2>自动生成模式演示</h2><p>在此模式下，AI会自动生成响应内容，无需您手动输入。AI响应会显示在下方的文本区域中。</p>",
+                    questions: [
+                        {
+                            prompt: "AI自动生成的创意故事开头：",
+                            name: "auto_story",
+                            rows: 6,
+                            columns: 60
+                        },
+                        {
+                            prompt: "AI自动生成的生活建议：",
+                            name: "auto_advice",
+                            rows: 6,
+                            columns: 60
+                        }
+                    ],
+                    auto_generate: true,
+                    hide_user_input: true,
+                    ai_analysis_mode: "individual",
+                    show_individual_ai_areas: true,
+                    base_url: "https://dashscope.aliyuncs.com",
+                    api: "/compatible-mode/v1/chat/completions",
+                    api_key: "sk-0fe0f8b0e21e42b7bbfa736fe7549da3",
+                    llm_model: "qwen-turbo", 
+                    system_prompt: "请生成有创意和启发性的内容。对于故事开头，创作一个引人入胜的开头段落。对于生活建议，提供实用的人生智慧。",
+                    button_label: "查看结果"
+                }
+            },
+            
+            personality: {
+                title: "中国大五人格问卷测评",
+                description: "完成40题大五人格问卷，AI将对您的性格特征进行科学严谨且有趣的分析。",
+                trial: [
+                    // 第一阶段：问卷收集
+                    {
+                        type: jsPsychSurveyLikert,
+                        preamble: `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2>中国大五人格问卷简式版（CBF–PI–B）</h2>
+                                <div style="background: #e8f4fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 0 6px 6px 0;">
+                                    <p><strong>指导语：</strong>下面是一些描述人们性格特点的句子，请根据每个句子与您的性格相符程度选择相应的数字。</p>
+                                    <p><strong>评分标准：</strong>1=完全不符合，2=大部分不符合，3=有点不符合，4=有点符合，5=大部分符合，6=完全符合</p>
+                                    <p style="color: #666; font-size: 14px; margin-top: 10px;"><em>每个人的性格各不相同，所以答案没有对错之分，请根据您的实际情况作答。</em></p>
+                                </div>
+                            </div>
+                        `,
+                        questions: [
+                            {
+                                prompt: "我常感到害怕",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q1"
+                            },
+                            {
+                                prompt: "一旦确定了目标，我会坚持努力地实现它",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q2"
+                            },
+                            {
+                                prompt: "我觉得大部分人基本上是心怀善意的",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q3"
+                            },
+                            {
+                                prompt: "我头脑中经常充满生动的画面",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q4"
+                            },
+                            {
+                                prompt: "我对人多的聚会感到乏味",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q5"
+                            },
+                            {
+                                prompt: "有时我觉得自己一无是处",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q6"
+                            },
+                            {
+                                prompt: "我常常是仔细考虑之后才做出决定",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q7"
+                            },
+                            {
+                                prompt: "我不太关心别人是否受到不公正的待遇",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q8"
+                            },
+                            {
+                                prompt: "我是个勇于冒险，突破常规的人",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q9"
+                            },
+                            {
+                                prompt: "在热闹的聚会上，我常常表现主动并尽情玩耍",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q10"
+                            },
+                            {
+                                prompt: "别人一句漫不经心的话，我常会联系在自己身上",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q11"
+                            },
+                            {
+                                prompt: "别人认为我是个慎重的人",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q12"
+                            },
+                            {
+                                prompt: "我时常觉得别人的痛苦与我无关",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q13"
+                            },
+                            {
+                                prompt: "我喜欢冒险",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q14"
+                            },
+                            {
+                                prompt: "我尽量避免参加人多的聚会和嘈杂的环境",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q15"
+                            },
+                            {
+                                prompt: "在面对压力时，我有种快要崩溃的感觉",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q16"
+                            },
+                            {
+                                prompt: "我喜欢一开头就把事情计划好",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q17"
+                            },
+                            {
+                                prompt: "我是那种只照顾好自己，不替别人担忧的人",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q18"
+                            },
+                            {
+                                prompt: "我对许多事情有着很强的好奇心",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q19"
+                            },
+                            {
+                                prompt: "有我在的场合一般不会冷场",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q20"
+                            },
+                            {
+                                prompt: "我常担忧一些无关紧要的事情",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q21"
+                            },
+                            {
+                                prompt: "我工作或学习很勤奋",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q22"
+                            },
+                            {
+                                prompt: "虽然社会上有些骗子，但我觉得大部分人还是可信的",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q23"
+                            },
+                            {
+                                prompt: "我身上具有别人没有的冒险精神",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q24"
+                            },
+                            {
+                                prompt: "在一个团体中，我希望处于领导地位",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q25"
+                            },
+                            {
+                                prompt: "我常常感到内心不踏实",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q26"
+                            },
+                            {
+                                prompt: "我是个倾尽全力做事的人",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q27"
+                            },
+                            {
+                                prompt: "当别人向我诉说不幸时，我常感到难过",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q28"
+                            },
+                            {
+                                prompt: "我渴望学习一些新东西，即使它们与我的日常生活无关",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q29"
+                            },
+                            {
+                                prompt: "别人多认为我是一个热情和友好的人",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q30"
+                            },
+                            {
+                                prompt: "我常担心有什么不好的事情要发生",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q31"
+                            },
+                            {
+                                prompt: "在工作上，我常只求能应付过去便可",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q32"
+                            },
+                            {
+                                prompt: "尽管人类社会存在着一些阴暗的东西（如战争、罪恶、欺诈），我仍然相信人性总的来说是善良的",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q33"
+                            },
+                            {
+                                prompt: "我的想象力相当丰富",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q34"
+                            },
+                            {
+                                prompt: "我喜欢参加社交与娱乐聚会",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q35"
+                            },
+                            {
+                                prompt: "我很少感到忧郁或沮丧",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q36"
+                            },
+                            {
+                                prompt: "做事讲究逻辑和条理是我的一个特点",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q37"
+                            },
+                            {
+                                prompt: "我常为那些遭遇不幸的人感到难过",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q38"
+                            },
+                            {
+                                prompt: "我很愿意也很容易接受那些新事物、新观点、新想法",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q39"
+                            },
+                            {
+                                prompt: "我希望成为领导者而不是被领导者",
+                                labels: ["1<br>完全不符合", "2<br>大部分不符合", "3<br>有点不符合", "4<br>有点符合", "5<br>大部分符合", "6<br>完全符合"],
+                                required: true,
+                                name: "q40"
+                            }
+                        ],
+                        button_label: "提交问卷"
+                    },
+                    
+                    // 第二阶段：AI分析
+                    {
+                        type: jsPsychAISurvey,
+                        preamble: `
+                            <div style="text-align: center; padding: 30px;">
+                                <h2>正在生成您的人格分析报告...</h2>
+                                <p style="color: #666; font-size: 16px;">AI正在基于您的问卷答案进行深度分析，请稍候</p>
+                            </div>
+                        `,
+                        questions: [{
+                            prompt: "您的大五人格分析报告：",
+                            name: "personality_analysis",
+                            rows: 20,
+                            columns: 80
+                        }],
+                        auto_generate: true,
+                        hide_user_input: true,
+                        ai_analysis_mode: "individual",
+                        show_individual_ai_areas: true,
+                        
+                        // 获取前一个试次的问卷数据
+                        data_collector: function() {
+                            console.log('data_collector 函数被调用');
+                            
+                            // 在jsPsych v7中，需要通过试次上下文获取数据
+                            // 这个函数会在试次执行时被调用，此时可以访问jsPsych实例
+                            if (typeof window.currentJsPsychInstance !== 'undefined' && window.currentJsPsychInstance) {
+                                console.log('找到 jsPsych 实例');
+                                
+                                const allData = window.currentJsPsychInstance.data.get();
+                                console.log('所有数据:', allData.values());
+                                
+                                const surveyTrials = allData.filter({trial_type: 'survey-likert'});
+                                console.log('问卷试次:', surveyTrials.values());
+                                
+                                const surveyData = surveyTrials.last(1).values()[0];
+                                console.log('最新问卷数据:', surveyData);
+                                
+                                if (surveyData && surveyData.response) {
+                                    console.log('找到问卷响应数据:', surveyData.response);
+                                    
+                                    // 格式化问卷数据用于AI分析
+                                    let formattedData = "用户的问卷回答结果：\n\n";
+                                    
+                                    for (let i = 1; i <= 40; i++) {
+                                        const questionKey = `q${i}`;
+                                        if (surveyData.response[questionKey] !== undefined) {
+                                            formattedData += `题目${i}：${surveyData.response[questionKey]}分\n`;
+                                        }
+                                    }
+                                    
+                                    console.log('格式化的数据:', formattedData);
+                                    
+                                    return {
+                                        questionnaire_data: formattedData
+                                    };
+                                } else {
+                                    console.log('没有找到问卷响应数据');
+                                }
+                            } else {
+                                console.log('没有找到 jsPsych 实例');
+                            }
+                            
+                            return {
+                                questionnaire_data: "无法获取问卷数据"
+                            };
+                        },
+                        
+                        system_prompt: `你是一位心理学专家，擅长大五人格理论分析。请基于心理学原理，对问卷结果进行科学、准确、有趣的分析。
+
+分析框架：
+
+以下是问卷各维度的组成：
+- 神经质（情绪稳定性）：题目 1、6、11、16、21、26、31、36
+- 严谨性（尽责性）：题目 2、7、12、17、22、27、32、37  
+- 宜人性：题目 3、8、13、18、23、28、33、38
+- 开放性：题目 4、9、14、19、24、29、34、39
+- 外向性：题目 5、10、15、20、25、30、35、40
+
+反向计分题目：5、8、13、15、18、32、36（计算时用7减去实际得分）
+
+请按以下格式进行分析：
+
+1. **得分计算**：计算各维度得分（记住反向计分题目）
+2. **人格画像**：用生动有趣的语言描述这个人的性格特点
+3. **五维详析**：每个维度的详细分析
+4. **职业建议**：根据人格特征推荐适合的职业方向
+5. **发展建议**：针对性的个人成长建议
+6. **趣味洞察**：用比喻或类比来形象化描述这个人格
+
+请用科学的数据分析结合通俗易懂的语言，让结果既专业又有趣。`,
+                        
+                        button_label: "查看分析报告",
+                        interface_language: "zh"
+                    }
+                ]
+            }
+        };
+
+        function runDemo(demoType) {
+            // 更新导航按钮状态
+            document.querySelectorAll('.demo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 找到并激活对应的按钮
+            const buttonTexts = {
+                'multi_plugin_integration': '🔗 多插件数据集成',
+                'survey_choice_analysis': '📊 选择题+AI分析',
+                'reaction_time_analysis': '⚡ 反应时+AI洞察',
+                'mouse_tracking_decision': '🖱️ 鼠标轨迹决策',
+                'comprehensive_experiment': '🧪 综合实验设计',
+                'creativity_ai': '🎨 创造力与AI协作',
+                'ai_personality_moral': '⚖️ AI人格道德判断',
+                'multi_ai_analysis': '🔄 一次输入多AI分析'
+            };
+            
+            const targetButton = Array.from(document.querySelectorAll('.demo-btn')).find(btn => 
+                btn.textContent.trim() === buttonTexts[demoType]
+            );
+            
+            if (targetButton) {
+                targetButton.classList.add('active');
+            }
+            
+            const config = demoConfigs[demoType];
+            
+            // 显示演示描述
+            const container = document.getElementById('jspsych-container');
+            container.innerHTML = `
+                <div class="demo-description">
+                    <h4>${config.title}</h4>
+                    <p>${config.description}</p>
+                </div>
+                <div id="jspsych-experiment-content"></div>
+            `;
+            
+            // 重新初始化 jsPsych 实例，指向新的容器
+            const jsPsychInstance = initJsPsych({
+                display_element: 'jspsych-experiment-content',
+                on_finish: function(data) {
+                    console.log('实验完成，数据：', data.values());
+                    
+                    // 显示结果
+                    const expContainer = document.getElementById('jspsych-experiment-content');
+                    expContainer.innerHTML = `
+                        <div class="demo-description">
+                            <h4>✅ 实验完成！</h4>
+                            <p>数据已保存到浏览器控制台。您可以打开开发者工具（F12）查看完整数据。</p>
+                        </div>
+                        <div style="background: #f8f9fa; border-radius: 6px; padding: 20px; margin-top: 20px;">
+                            <h5>数据预览：</h5>
+                            <pre style="background: white; padding: 15px; border-radius: 4px; overflow-x: auto; font-size: 12px;">
+${JSON.stringify(data.values(), null, 2)}
+                            </pre>
+                        </div>
+                        <button class="demo-btn" onclick="location.reload()" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">
+                            重新开始演示
+                        </button>
+                    `;
+                }
+            });
+            
+            // 保存jsPsych实例到全局变量，供data_collector函数使用
+            window.currentJsPsychInstance = jsPsychInstance;
+            
+            // 合并用户API配置到试次配置中
+            const userConfig = getDynamicConfig();
+            let mergedTrials;
+            
+            if (Array.isArray(config.trial)) {
+                // 如果是多个试次（如personality测评），合并配置到需要API的试次
+                mergedTrials = config.trial.map(trial => {
+                    if (trial.type === jsPsychAISurvey) {
+                        // 重要：保留原有配置，只覆盖API相关配置
+                        console.log('🔧 runDemo：合并API配置到AI试次，原始试次配置:', trial);
+                        const mergedTrial = {
+                            ...trial,  // 保留所有原有配置（包括data_collector等）
+                            base_url: userConfig.base_url,
+                            api: userConfig.api,
+                            api_key: userConfig.api_key,
+                            llm_model: userConfig.llm_model,
+                            api_timeout: userConfig.api_timeout
+                        };
+                        console.log('🔧 runDemo：合并后的试次配置:', mergedTrial);
+                        console.log('🔧 runDemo：data_collector函数是否存在:', typeof mergedTrial.data_collector === 'function');
+                        return mergedTrial;
+                    }
+                    return trial;
+                });
+            } else {
+                // 单个试次
+                console.log('🔧 runDemo：处理单个试次，原始配置:', config.trial);
+                const mergedTrial = {
+                    ...config.trial,  // 保留所有原有配置（包括data_collector等）
+                    base_url: userConfig.base_url,
+                    api: userConfig.api,
+                    api_key: userConfig.api_key,
+                    llm_model: userConfig.llm_model,
+                    api_timeout: userConfig.api_timeout
+                };
+                console.log('🔧 runDemo：单个试次合并后配置:', mergedTrial);
+                console.log('🔧 runDemo：单个试次data_collector函数是否存在:', typeof mergedTrial.data_collector === 'function');
+                mergedTrials = [mergedTrial];
+            }
+            
+            // 运行实验
+            jsPsychInstance.run(mergedTrials);
+        }
+
+        // 页面加载完成后运行默认演示
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化默认配置
+            loadConfig(); // 尝试加载保存的配置
+            if (!document.getElementById('api-key').value) {
+                // 如果没有保存的配置，使用默认配置
+                resetConfig();
+            }
+            
+            // 确保demoConfigs已经初始化后再运行演示
+            setTimeout(() => {
+                console.log('🚀 页面初始化完成，demoConfigs:', Object.keys(demoConfigs));
+                console.log('🚀 jsPsychAISurvey:', typeof jsPsychAISurvey);
+                runDemo('multi_plugin_integration');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
